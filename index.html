@@ -439,7 +439,7 @@
                 }
             }
             
-            const secondPercentage = candidates[secondBest].percentage[Math.floor(Math.random() * candidates[secondBest].percentage.length)] - Math.floor(Math.random() * 20 + 10);
+            const secondPercentage = 100 - percentage;
             document.getElementById('secondLabel').textContent = `2순위: ${secondBest} 후보`;
             const secondProgressFill = document.getElementById('secondProgressFill');
             const secondProgressText = document.getElementById('secondProgressText');
