@@ -26,8 +26,6 @@
         .start-screen h1 { font-size: 1.7em; color: #333; margin-bottom: 10px; font-weight: 600; line-height: 1.3; }
         .start-screen h2 { font-size: 1.3em; color: #666; margin-bottom: 25px; font-weight: 500; }
         .candidate-image { width: 200px; height: 200px; background: #f0f0f0; border-radius: 15px; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.9em; background-image: url('https://raw.githubusercontent.com/WHILILI/TEST/main/main.jpg'); background-size: cover; background-position: center; }
-        .stats { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 0.9em; }
-        .stats div { margin: 5px 0; color: #666; }
         .start-btn { background: #b794f6; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.2em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin: 20px 0; }
         .start-btn:hover { background: #a78bfa; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(183, 148, 246, 0.3); }
         .disclaimer { font-size: 0.8em; color: #666; line-height: 1.4; margin-top: 20px; text-align: left; }
@@ -67,11 +65,27 @@
         .result-progress-fill { height: 100%; background: linear-gradient(135deg, #b794f6, #d6bcfa); border-radius: 20px; transition: width 1s ease; position: relative; }
         .result-progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 600; color: #333; font-size: 1em; z-index: 10; }
         .result-progress-label { font-size: 0.9em; color: #666; margin-bottom: 5px; font-weight: 500; }
-        .link-btn { background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 0.95em; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; width: 100%; }
-        .link-btn:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); }: 50%; transform: translate(-50%, -50%); font-weight: 600; color: #333; font-size: 1em; z-index: 10; }
+        
         .share-section { margin-top: 25px; padding: 20px; background: #f3e8ff; border-radius: 10px; }
-        .share-btn { background: #b794f6; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 0.95em; cursor: pointer; transition: all 0.3s ease; }
-        .share-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .share-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+        .share-btn { 
+            background: #b794f6; 
+            color: white; 
+            border: none; 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            font-size: 0.9em; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            flex: 1;
+            min-width: 100px;
+            white-space: nowrap;
+        }
+        .share-btn:hover { 
+            background: #a78bfa;
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(183, 148, 246, 0.3); 
+        }
         
         @media (max-width: 480px) {
             .container { margin: 5px; }
@@ -80,6 +94,8 @@
             .option { padding: 15px 18px; font-size: 0.9em; }
             .start-screen h1 { font-size: 1.5em; }
             .start-screen h2 { font-size: 1.1em; }
+            .share-buttons { flex-direction: column; }
+            .share-btn { min-width: auto; }
         }
     </style>
 </head>
@@ -91,10 +107,6 @@
             <h1>누구뽑을지 고민된다면?</h1>
             <h2>공약으로 고르는 21대선 후보</h2>
             <div class="candidate-image"></div>
-            <div class="stats">
-                <div>📊 전체 참여: <span id="totalCount">45,231</span>명</div>
-                <div>🕐 오늘 참여: <span id="todayCount">324</span>명</div>
-            </div>
             <button class="start-btn" onclick="startTest()">뽑으러 가기!</button>
             <div class="disclaimer">
                 *본 설문은 정치적인 목적으로 이용되지 않으며 특정후보를 지지 하지않습니다.<br>
@@ -123,7 +135,7 @@
 
         <div class="result" id="result">
             <div class="result-image" id="resultImage"></div>
-            <div class="result-title" id="resultTitle">이재명</div>
+            <div class="result-title" id="resultTitle">이재명 후보</div>
             
             <div class="result-progress-label" id="firstLabel">1순위: 이재명 후보</div>
             <div class="result-progress">
@@ -140,7 +152,7 @@
             <div class="result-subtitle" id="resultSubtitle">권영국 후보는 나와 전혀 다른 길...</div>
             
             <div class="share-section">
-                <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                <div class="share-buttons">
                     <button class="share-btn" onclick="restart()">다시하기</button>
                     <button class="share-btn" onclick="shareResult()">결과 공유하기</button>
                     <button class="share-btn" onclick="shareTest()">테스트 공유하기</button>
@@ -307,34 +319,6 @@
         let answers = [];
         let scores = { "이재명": 0, "김문수": 0, "이준석": 0, "권영국": 0 };
 
-        function generateRandomCounts() {
-            let totalCount = localStorage.getItem('totalCount');
-            let todayCount = localStorage.getItem('todayCount');
-            let lastDate = localStorage.getItem('lastDate');
-            
-            const today = new Date().toDateString();
-            
-            if (!totalCount || !todayCount) {
-                totalCount = Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000;
-                todayCount = Math.floor(Math.random() * (600 - 100 + 1)) + 100;
-                
-                localStorage.setItem('totalCount', totalCount);
-                localStorage.setItem('todayCount', todayCount);
-                localStorage.setItem('lastDate', today);
-            }
-            else if (lastDate !== today) {
-                totalCount = parseInt(totalCount) + parseInt(todayCount);
-                todayCount = Math.floor(Math.random() * (600 - 100 + 1)) + 100;
-                
-                localStorage.setItem('totalCount', totalCount);
-                localStorage.setItem('todayCount', todayCount);
-                localStorage.setItem('lastDate', today);
-            }
-            
-            document.getElementById('totalCount').textContent = parseInt(totalCount).toLocaleString();
-            document.getElementById('todayCount').textContent = parseInt(todayCount).toLocaleString();
-        }
-
         function startTest() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('testHeader').style.display = 'block';
@@ -435,7 +419,7 @@
             resultImage.style.backgroundImage = `url('${candidates[bestCandidate].image}')`;
             resultImage.textContent = '';
             
-            document.getElementById('resultTitle').textContent = bestCandidate;
+            document.getElementById('resultTitle').textContent = `${bestCandidate} 후보`;
             document.getElementById('resultSubtitle').textContent = 
                 `${worstCandidate} 후보는 나와 전혀 다른 길…`;
             
@@ -511,10 +495,7 @@
             document.getElementById('testContent').style.display = 'none';
             document.getElementById('result').classList.remove('show');
             document.getElementById('startScreen').style.display = 'block';
-            generateRandomCounts();
         }
-
-        generateRandomCounts();
     </script>
 </body>
 </html>
