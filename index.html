@@ -123,7 +123,7 @@
 
         <div class="result" id="result">
             <div class="result-image" id="resultImage"></div>
-            <div class="result-title" id="resultTitle">이재명 후보와 일치합니다!</div>
+            <div class="result-title" id="resultTitle">이재명</div>
             
             <div class="result-progress-label" id="firstLabel">1순위: 이재명 후보</div>
             <div class="result-progress">
@@ -145,7 +145,6 @@
                     <button class="share-btn" onclick="shareResult()">결과 공유하기</button>
                     <button class="share-btn" onclick="shareTest()">테스트 공유하기</button>
                 </div>
-                <button class="link-btn" onclick="goToLink()">🗳️ 다른 테스트 해보기</button>
             </div>
             <div class="disclaimer">
                 *본 설문은 정치적인 목적으로 이용되지 않으며 특정후보를 지지 하지않습니다.<br>
@@ -161,7 +160,7 @@
         const questions = [
             {
                 category: "정치개혁",
-                q: "대통령 임기와 관련된 개헌 공약은 무엇인가요?",
+                q: "대통령 임기 공약은?",
                 options: [
                     { text: "대통령 4년 연임제와 결선투표제 도입", candidate: "이재명" },
                     { text: "대통령 권한 분산과 3부총리제 도입", candidate: "이준석" },
@@ -171,7 +170,7 @@
             },
             {
                 category: "정치개혁",
-                q: "사법개혁과 관련된 공약은 무엇인가요?",
+                q: "사법개혁 공약은?",
                 options: [
                     { text: "검찰·경찰의 수사권 분리와 독립성 강화", candidate: "김문수" },
                     { text: "감사원 국회 이관과 대통령 거부권 제한", candidate: "이재명" },
@@ -181,7 +180,7 @@
             },
             {
                 category: "경제",
-                q: "경제 활성화를 위한 주요 공약은 무엇인가요?",
+                q: "경제 활성화 공약은?",
                 options: [
                     { text: "리쇼어링 지원과 규제기준 국가제 도입", candidate: "이준석" },
                     { text: "기업 규제·세제 완화로 기업하기 좋은 나라", candidate: "김문수" },
@@ -191,7 +190,7 @@
             },
             {
                 category: "경제",
-                q: "AI 규제와 관련된 공약은 무엇인가요?",
+                q: "AI 규제 공약은?",
                 options: [
                     { text: "AI 규제 강화를 통한 공정 경쟁", candidate: "권영국" },
                     { text: "AI 관련 규제 완화로 혁신 촉진", candidate: "이준석" },
@@ -201,7 +200,7 @@
             },
             {
                 category: "경제",
-                q: "노동자 권리와 관련된 공약은 무엇인가요?",
+                q: "노동자 권리 공약은?",
                 options: [
                     { text: "불안정 노동자 1,500만 명 권리 보장", candidate: "권영국" },
                     { text: "주 4.5일제 도입으로 노동시간 단축", candidate: "이재명" },
@@ -211,7 +210,7 @@
             },
             {
                 category: "사회",
-                q: "사회 갈등 해소와 통합을 위한 공약은 무엇인가요?",
+                q: "사회 갈등 해소 공약은?",
                 options: [
                     { text: "사회통합을 대통령의 제1책무로 강조", candidate: "이재명" },
                     { text: "중대재해처벌법 강화를 통한 노동자 보호", candidate: "권영국" },
@@ -221,7 +220,7 @@
             },
             {
                 category: "사회",
-                q: "기후 위기 대응 방안은 무엇인가요?",
+                q: "기후 위기 대응 공약은?",
                 options: [
                     { text: "AI·에너지 3대 강국 도약", candidate: "김문수" },
                     { text: "친환경 로컬푸드 공공급식 의무화", candidate: "권영국" },
@@ -231,7 +230,7 @@
             },
             {
                 category: "복지",
-                q: "주거 문제 해결을 위한 공약은 무엇인가요?",
+                q: "주거 문제 해결 공약은?",
                 options: [
                     { text: "청년 스타트업 빌리지 조성", candidate: "이준석" },
                     { text: "부동산 규제 완화로 시장 활성화", candidate: "김문수" },
@@ -241,7 +240,7 @@
             },
             {
                 category: "복지",
-                q: "노인 복지와 관련된 공약은 무엇인가요?",
+                q: "노인 복지 공약은?",
                 options: [
                     { text: "청년사회상속제로 노인 자산 재분배", candidate: "권영국" },
                     { text: "노인일자리 박람회 지원과 연금 개혁", candidate: "이준석" },
@@ -251,7 +250,7 @@
             },
             {
                 category: "복지",
-                q: "연금·의료 개혁과 관련된 공약은 무엇인가요?",
+                q: "연금·의료 개혁 공약은?",
                 options: [
                     { text: "효율적 복지 전달을 위한 부처 통폐합", candidate: "이준석" },
                     { text: "돌봄권 헌법 명문화와 복지 확대", candidate: "권영국" },
@@ -261,7 +260,7 @@
             },
             {
                 category: "외교",
-                q: "한미 관계와 통상 정책은 무엇인가요?",
+                q: "한미 관계와 통상 정책 공약은?",
                 options: [
                     { text: "국익 중심의 실용외교와 한미동맹 강화", candidate: "이재명" },
                     { text: "한미 정상회담 즉시 추진으로 관세 대응", candidate: "김문수" },
@@ -271,7 +270,7 @@
             },
             {
                 category: "외교",
-                q: "대북 정책과 관련된 공약은 무엇인가요?",
+                q: "대북 정책 공약은?",
                 options: [
                     { text: "한미동맹 중심의 대북 압박 강화", candidate: "김문수" },
                     { text: "북핵 비핵화 프로세스 재개", candidate: "이재명" },
@@ -436,8 +435,7 @@
             resultImage.style.backgroundImage = `url('${candidates[bestCandidate].image}')`;
             resultImage.textContent = '';
             
-            document.getElementById('resultTitle').textContent = 
-                `${bestCandidate} 후보와 일치합니다!`;
+            document.getElementById('resultTitle').textContent = bestCandidate;
             document.getElementById('resultSubtitle').textContent = 
                 `${worstCandidate} 후보는 나와 전혀 다른 길…`;
             
@@ -470,10 +468,6 @@
             }, 500);
             
             document.getElementById('result').classList.add('show');
-        }
-
-        function goToLink() {
-            window.open('https://example.com', '_blank');
         }
 
         function shareResult() {
