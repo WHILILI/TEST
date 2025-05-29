@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>누구뽑을지 고민된다면? 공약으로 고르는 21대선 후보</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Malgun Gothic', sans-serif; background: linear-gradient(135deg, #b794f6, #d6bcfa); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; }
+        
+        .ad-space { width: 100%; max-width: 480px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 8px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6); font-size: 0.9em; }
+        
+        .container { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 480px; width: 100%; overflow: hidden; }
+        
+        .start-screen { text-align: center; padding: 40px 25px; }
+        .start-screen h1 { font-size: 1.7em; color: #333; margin-bottom: 10px; font-weight: 600; line-height: 1.3; }
+        .start-screen h2 { font-size: 1.3em; color: #666; margin-bottom: 25px; font-weight: 500; }
+        .candidate-image { width: 200px; height: 200px; background: #f0f0f0; border-radius: 15px; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.9em; background-image: url('https://raw.githubusercontent.com/parksh3641/MBTI/main/main.jpg'); background-size: cover; background-position: center; }
+        .stats { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 0.9em; }
+        .stats div { margin: 5px 0; color: #666; }
+        .start-btn { background: #b794f6; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.2em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin: 20px 0; }
+        .start-btn:hover { background: #a78bfa; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(183, 148, 246, 0.3); }
+        .disclaimer { font-size: 0.8em; color: #666; line-height: 1.4; margin-top: 20px; text-align: left; }
+        .copyright { font-size: 0.7em; color: #999; margin-top: 15px; }
+        
+        .header { background: linear-gradient(135deg, #b794f6, #d6bcfa); color: white; padding: 25px; text-align: center; }
+        .header h1 { font-size: 1.4em; margin-bottom: 5px; }
+        .header p { font-size: 0.85em; opacity: 0.9; }
+        .progress { width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; margin-top: 15px; overflow: hidden; }
+        .progress-fill { height: 100%; background: white; width: 0%; transition: width 0.3s ease; border-radius: 3px; }
+        
+        .content { padding: 30px 25px; }
+        .question-card { display: none; text-align: center; }
+        .question-card.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .question-num { color: #b794f6; font-size: 0.9em; font-weight: 600; margin-bottom: 15px; }
+        .question-text { font-size: 1.2em; font-weight: 500; color: #333; margin-bottom: 25px; line-height: 1.5; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { padding: 18px 20px; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; background: #f8f9fa; font-size: 0.95em; color: #495057; text-align: left; line-height: 1.4; }
+        .option:hover { border-color: #b794f6; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(183, 148, 246, 0.2); }
+        .option.selected { border-color: #b794f6; background: #f3e8ff; color: #7c3aed; font-weight: 500; }
+        
+        .navigation { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e9ecef; }
+        .nav-btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 500; transition: all 0.3s ease; }
+        .prev-btn { background: #6c757d; color: white; }
+        .next-btn { background: #b794f6; color: white; }
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .result { display: none; text-align: center; padding: 40px 25px; }
+        .result.show { display: block; animation: zoomIn 0.6s ease; }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .result-image { width: 150px; height: 150px; background: #f0f0f0; border-radius: 15px; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.9em; background-size: cover; background-position: center; }
+        .result-title { font-size: 1.4em; color: #333; margin: 20px 0; font-weight: 600; line-height: 1.3; }
+        .result-subtitle { font-size: 1em; color: #666; margin-bottom: 25px; }
+        .result-progress { width: 100%; height: 40px; background: #e9ecef; border-radius: 20px; margin: 20px 0; position: relative; overflow: hidden; }
+        .result-progress-fill { height: 100%; background: linear-gradient(135deg, #b794f6, #d6bcfa); border-radius: 20px; transition: width 1s ease; position: relative; }
+        .result-progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 600; color: #333; font-size: 1em; z-index: 10; }
+        .share-section { margin-top: 25px; padding: 20px; background: #f3e8ff; border-radius: 10px; }
+        .share-btn { background: #b794f6; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 0.95em; cursor: pointer; transition: all 0.3s ease; }
+        .share-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        
+        @media (max-width: 480px) {
+            .container { margin: 5px; }
+            .content { padding: 25px 20px; }
+            .question-text { font-size: 1.1em; }
+            .option { padding: 15px 18px; font-size: 0.9em; }
+            .start-screen h1 { font-size: 1.5em; }
+            .start-screen h2 { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ad-space">광고 영역</div>
+    
+    <div class="container">
+        <div class="start-screen" id="startScreen">
+            <h1>누구뽑을지 고민된다면?</h1>
+            <h2>공약으로 고르는 21대선 후보</h2>
+            <div class="candidate-image"></div>
+            <div class="stats">
+                <div>📊 전체 참여: <span id="totalCount">45,231</span>명</div>
+                <div>🕐 오늘 참여: <span id="todayCount">324</span>명</div>
+            </div>
+            <button class="start-btn" onclick="startTest()">뽑으러 가기!</button>
+            <div class="disclaimer">
+                *본 설문은 정치적인 목적으로 이용되지 않으며 특정후보를 지지 하지않습니다.<br>
+                *2025년 5월28일 기준 TV대선 토론 후보들의 공약 입니다.<br>
+                *본 설문은 후보들의 일부 공약이며 전체를 대변하지 않습니다. 절대적인 지표가 될수없으며 참고용으로 신중한 투표를 권장합니다.
+            </div>
+            <div class="copyright">© 휠릴리</div>
+        </div>
+
+        <div class="header" id="testHeader" style="display: none;">
+            <h1>공약으로 고르는 21대선 후보</h1>
+            <p>12문항으로 알아보는 나의 정치 성향</p>
+            <div class="progress">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="content" id="testContent" style="display: none;">
+            <div id="questionContainer"></div>
+            
+            <div class="navigation">
+                <button class="nav-btn prev-btn" id="prevBtn" onclick="prevQuestion()">이전</button>
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextQuestion()">다음</button>
+            </div>
+        </div>
+
+        <div class="result" id="result">
+            <div class="result-image" id="resultImage"></div>
+            <div class="result-title" id="resultTitle">이재명 후보와 일치합니다!</div>
+            
+            <div class="result-progress">
+                <div class="result-progress-fill" id="resultProgressFill"></div>
+                <div class="result-progress-text" id="resultProgressText">82%</div>
+            </div>
+            
+            <div class="result-subtitle" id="resultSubtitle">권영국 후보는 나와 전혀 다른 길...</div>
+            
+            <div class="share-section">
+                <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                    <button class="share-btn" onclick="restart()">다시하기</button>
+                    <button class="share-btn" onclick="shareResult()">결과 공유하기</button>
+                    <button class="share-btn" onclick="shareTest()">테스트 공유하기</button>
+                </div>
+            </div>
+            <div class="disclaimer">
+                *본 설문은 정치적인 목적으로 이용되지 않으며 특정후보를 지지 하지않습니다.<br>
+                *2025년 5월28일 기준 TV대선 토론 후보들의 공약 입니다.<br>
+                *본 설문은 후보들의 일부 공약이며 전체를 대변하지 않습니다. 절대적인 지표가 될수없으며 참고용으로 신중한 투표를 권장합니다.
+            </div>
+        </div>
+    </div>
+    
+    <div class="ad-space">광고 영역</div>
+
+    <script>
+        const questions = [
+            {
+                category: "정치개혁",
+                q: "대통령 임기와 관련된 개헌 공약은 무엇인가요?",
+                options: [
+                    { text: "대통령 4년 연임제와 결선투표제 도입", candidate: "이재명" },
+                    { text: "대통령 권한 분산과 3부총리제 도입", candidate: "이준석" },
+                    { text: "권역별 개방형 정당명부제와 국회의원 정수 확대", candidate: "권영국" },
+                    { text: "대통령 임기를 3년으로 단축하는 개헌", candidate: "김문수" }
+                ]
+            },
+            {
+                category: "정치개혁",
+                q: "사법개혁과 관련된 공약은 무엇인가요?",
+                options: [
+                    { text: "검찰·경찰의 수사권 분리와 독립성 강화", candidate: "김문수" },
+                    { text: "감사원 국회 이관과 대통령 거부권 제한", candidate: "이재명" },
+                    { text: "부처 통폐합으로 효율적 사법 운영 추구", candidate: "이준석" },
+                    { text: "시민발안권 도입과 비례대표제 강화", candidate: "권영국" }
+                ]
+            },
+            {
+                category: "경제",
+                q: "경제 활성화를 위한 주요 공약은 무엇인가요?",
+                options: [
+                    { text: "리쇼어링 지원과 규제기준 국가제 도입", candidate: "이준석" },
+                    { text: "기업 규제·세제 완화로 기업하기 좋은 나라", candidate: "김문수" },
+                    { text: "AI와 신산업에 100조원 민관합동펀드 조성", candidate: "이재명" },
+                    { text: "상속·증여세 90% 상향으로 부의 대물림 해체", candidate: "권영국" }
+                ]
+            },
+            {
+                category: "경제",
+                q: "AI 규제와 관련된 공약은 무엇인가요?",
+                options: [
+                    { text: "AI 규제 강화를 통한 공정 경쟁", candidate: "권영국" },
+                    { text: "AI 관련 규제 완화로 혁신 촉진", candidate: "이준석" },
+                    { text: "AI·에너지 중심의 산업 육성", candidate: "김문수" },
+                    { text: "AI 데이터센터 구축과 GPU 5만개 확보", candidate: "이재명" }
+                ]
+            },
+            {
+                category: "경제",
+                q: "노동자 권리와 관련된 공약은 무엇인가요?",
+                options: [
+                    { text: "불안정 노동자 1,500만 명 권리 보장", candidate: "권영국" },
+                    { text: "주 4.5일제 도입으로 노동시간 단축", candidate: "이재명" },
+                    { text: "청년 AI 인재 20만 명 양성", candidate: "이준석" },
+                    { text: "일자리 창출을 위한 기업 규제 완화", candidate: "김문수" }
+                ]
+            },
+            {
+                category: "사회",
+                q: "사회 갈등 해소와 통합을 위한 공약은 무엇인가요?",
+                options: [
+                    { text: "사회통합을 대통령의 제1책무로 강조", candidate: "이재명" },
+                    { text: "중대재해처벌법 강화를 통한 노동자 보호", candidate: "권영국" },
+                    { text: "지방분권으로 지역 간 갈등 완화", candidate: "김문수" },
+                    { text: "남녀 갈라치기 정치 비판과 청년기회국가 건설", candidate: "이준석" }
+                ]
+            },
+            {
+                category: "사회",
+                q: "기후 위기 대응 방안은 무엇인가요?",
+                options: [
+                    { text: "AI·에너지 3대 강국 도약", candidate: "김문수" },
+                    { text: "친환경 로컬푸드 공공급식 의무화", candidate: "권영국" },
+                    { text: "기후 위기 대응을 위한 AI 기술 활용", candidate: "이재명" },
+                    { text: "탄소중립 목표 헌법 명문화", candidate: "이준석" }
+                ]
+            },
+            {
+                category: "복지",
+                q: "주거 문제 해결을 위한 공약은 무엇인가요?",
+                options: [
+                    { text: "청년 스타트업 빌리지 조성", candidate: "이준석" },
+                    { text: "부동산 규제 완화로 시장 활성화", candidate: "김문수" },
+                    { text: "311만호 주택 공급으로 주거안정 실현", candidate: "이재명" },
+                    { text: "주거권 헌법 명문화와 공공주택 확대", candidate: "권영국" }
+                ]
+            },
+            {
+                category: "복지",
+                q: "노인 복지와 관련된 공약은 무엇인가요?",
+                options: [
+                    { text: "청년사회상속제로 노인 자산 재분배", candidate: "권영국" },
+                    { text: "노인일자리 박람회 지원과 연금 개혁", candidate: "이준석" },
+                    { text: "효율적 복지 시스템을 위한 부처 통폐합", candidate: "김문수" },
+                    { text: "어르신 돌봄 국가책임제 도입", candidate: "이재명" }
+                ]
+            },
+            {
+                category: "복지",
+                q: "연금·의료 개혁과 관련된 공약은 무엇인가요?",
+                options: [
+                    { text: "효율적 복지 전달을 위한 부처 통폐합", candidate: "이준석" },
+                    { text: "돌봄권 헌법 명문화와 복지 확대", candidate: "권영국" },
+                    { text: "초고령 사회 대비 연금·의료 개혁", candidate: "이재명" },
+                    { text: "민간 중심의 의료 시스템 활성화", candidate: "김문수" }
+                ]
+            },
+            {
+                category: "외교",
+                q: "한미 관계와 통상 정책은 무엇인가요?",
+                options: [
+                    { text: "국익 중심의 실용외교와 한미동맹 강화", candidate: "이재명" },
+                    { text: "한미 정상회담 즉시 추진으로 관세 대응", candidate: "김문수" },
+                    { text: "북핵 해결과 실용외교 강조", candidate: "권영국" },
+                    { text: "관세 정책 대응을 위한 국제 연대", candidate: "이준석" }
+                ]
+            },
+            {
+                category: "외교",
+                q: "대북 정책과 관련된 공약은 무엇인가요?",
+                options: [
+                    { text: "한미동맹 중심의 대북 압박 강화", candidate: "김문수" },
+                    { text: "북핵 비핵화 프로세스 재개", candidate: "이재명" },
+                    { text: "강력한 국방과 실용외교로 안보 강화", candidate: "이준석" },
+                    { text: "평화 중심의 대북 협상 우선", candidate: "권영국" }
+                ]
+            }
+        ];
+
+        const candidates = {
+            "이재명": { 
+                name: "이재명", 
+                percentage: [82, 85, 88, 91, 86, 84, 87, 89],
+                image: "https://raw.githubusercontent.com/parksh3641/MBTI/main/lee_jae_myung.jpg"
+            },
+            "김문수": { 
+                name: "김문수", 
+                percentage: [80, 83, 86, 89, 84, 82, 85, 87],
+                image: "https://raw.githubusercontent.com/parksh3641/MBTI/main/kim_moon_soo.jpg"
+            },
+            "이준석": { 
+                name: "이준석", 
+                percentage: [78, 81, 84, 87, 82, 80, 83, 85],
+                image: "https://raw.githubusercontent.com/parksh3641/MBTI/main/lee_jun_seok.jpg"
+            },
+            "권영국": { 
+                name: "권영국", 
+                percentage: [76, 79, 82, 85, 80, 78, 81, 83],
+                image: "https://raw.githubusercontent.com/parksh3641/MBTI/main/kwon_young_guk.jpg"
+            }
+        };
+
+        let currentQ = 0;
+        let answers = [];
+        let scores = { "이재명": 0, "김문수": 0, "이준석": 0, "권영국": 0 };
+
+        function generateRandomCounts() {
+            let totalCount = localStorage.getItem('totalCount');
+            let todayCount = localStorage.getItem('todayCount');
+            let lastDate = localStorage.getItem('lastDate');
+            
+            const today = new Date().toDateString();
+            
+            if (!totalCount || !todayCount) {
+                totalCount = Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000;
+                todayCount = Math.floor(Math.random() * (600 - 100 + 1)) + 100;
+                
+                localStorage.setItem('totalCount', totalCount);
+                localStorage.setItem('todayCount', todayCount);
+                localStorage.setItem('lastDate', today);
+            }
+            else if (lastDate !== today) {
+                totalCount = parseInt(totalCount) + parseInt(todayCount);
+                todayCount = Math.floor(Math.random() * (600 - 100 + 1)) + 100;
+                
+                localStorage.setItem('totalCount', totalCount);
+                localStorage.setItem('todayCount', todayCount);
+                localStorage.setItem('lastDate', today);
+            }
+            
+            document.getElementById('totalCount').textContent = parseInt(totalCount).toLocaleString();
+            document.getElementById('todayCount').textContent = parseInt(todayCount).toLocaleString();
+        }
+
+        function startTest() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('testHeader').style.display = 'block';
+            document.getElementById('testContent').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const container = document.getElementById('questionContainer');
+            const q = questions[currentQ];
+            
+            let optionsHtml = '';
+            q.options.forEach((option, index) => {
+                optionsHtml += `<div class="option" onclick="selectAnswer(${index})">${option.text}</div>`;
+            });
+            
+            container.innerHTML = `
+                <div class="question-card active">
+                    <div class="question-num">Q${currentQ + 1} / 12 - ${q.category}</div>
+                    <div class="question-text">${q.q}</div>
+                    <div class="options">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+            
+            if (answers[currentQ] !== undefined) {
+                document.querySelectorAll('.option')[answers[currentQ]].classList.add('selected');
+            }
+            
+            updateUI();
+        }
+
+        function selectAnswer(choice) {
+            answers[currentQ] = choice;
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.option')[choice].classList.add('selected');
+            updateUI();
+        }
+
+        function nextQuestion() {
+            if (currentQ < 11) {
+                currentQ++;
+                showQuestion();
+            } else {
+                calculateResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQ > 0) {
+                currentQ--;
+                showQuestion();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('prevBtn').disabled = currentQ === 0;
+            document.getElementById('nextBtn').disabled = answers[currentQ] === undefined;
+            document.getElementById('nextBtn').textContent = currentQ === 11 ? '결과보기' : '다음';
+            document.getElementById('progressBar').style.width = ((currentQ + 1) / 12 * 100) + '%';
+        }
+
+        function calculateResult() {
+            scores = { "이재명": 0, "김문수": 0, "이준석": 0, "권영국": 0 };
+            
+            answers.forEach((answerIndex, questionIndex) => {
+                const selectedCandidate = questions[questionIndex].options[answerIndex].candidate;
+                scores[selectedCandidate]++;
+            });
+            
+            let maxScore = -1;
+            let minScore = 13;
+            let bestCandidate = '';
+            let worstCandidate = '';
+            
+            for (let candidate in scores) {
+                if (scores[candidate] > maxScore) {
+                    maxScore = scores[candidate];
+                    bestCandidate = candidate;
+                }
+                if (scores[candidate] < minScore) {
+                    minScore = scores[candidate];
+                    worstCandidate = candidate;
+                }
+            }
+            
+            showResult(bestCandidate, worstCandidate);
+        }
+
+        function showResult(bestCandidate, worstCandidate) {
+            document.getElementById('testHeader').style.display = 'none';
+            document.getElementById('testContent').style.display = 'none';
+            
+            const percentage = candidates[bestCandidate].percentage[Math.floor(Math.random() * candidates[bestCandidate].percentage.length)];
+            
+            const resultImage = document.getElementById('resultImage');
+            resultImage.style.backgroundImage = `url('${candidates[bestCandidate].image}')`;
+            resultImage.textContent = '';
+            
+            document.getElementById('resultTitle').textContent = 
+                `${bestCandidate} 후보와 일치합니다!`;
+            document.getElementById('resultSubtitle').textContent = 
+                `${worstCandidate} 후보는 나와 전혀 다른 길…`;
+            
+            const progressFill = document.getElementById('resultProgressFill');
+            const progressText = document.getElementById('resultProgressText');
+            
+            progressText.textContent = `${percentage}%`;
+            
+            setTimeout(() => {
+                progressFill.style.width = `${percentage}%`;
+            }, 500);
+            
+            document.getElementById('result').classList.add('show');
+        }
+
+        function shareResult() {
+            const title = document.getElementById('resultTitle').textContent;
+            const text = `누구뽑을지 고민된다면? 공약으로 고르는 21대선 후보 테스트 결과: ${title}`;
+            
+            if (navigator.share) {
+                navigator.share({ 
+                    title: '공약으로 고르는 21대선 후보', 
+                    text, 
+                    url: location.href 
+                });
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('결과가 복사되었습니다!');
+                });
+            }
+        }
+
+        function shareTest() {
+            const text = '누구뽑을지 고민된다면? 공약으로 고르는 21대선 후보 테스트를 해보세요!';
+            
+            if (navigator.share) {
+                navigator.share({ 
+                    title: '공약으로 고르는 21대선 후보', 
+                    text, 
+                    url: location.href 
+                });
+            } else {
+                navigator.clipboard.writeText(`${text} ${location.href}`).then(() => {
+                    alert('테스트 링크가 복사되었습니다!');
+                });
+            }
+        }
+
+        function restart() {
+            currentQ = 0;
+            answers = [];
+            scores = { "이재명": 0, "김문수": 0, "이준석": 0, "권영국": 0 };
+            document.getElementById('testHeader').style.display = 'none';
+            document.getElementById('testContent').style.display = 'none';
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('startScreen').style.display = 'block';
+            generateRandomCounts();
+        }
+
+        generateRandomCounts();
+    </script>
+</body>
+</html>
