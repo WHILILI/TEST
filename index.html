@@ -414,9 +414,7 @@
             document.getElementById('testContent').style.display = 'none';
             
             // 실제 점수 기반으로 백분율 계산
-            const totalQuestions = 12;
             const bestScore = scores[bestCandidate];
-            const percentage = Math.round((bestScore / totalQuestions) * 100);
             
             const resultImage = document.getElementById('resultImage');
             resultImage.style.backgroundImage = `url('${candidates[bestCandidate].image}')`;
@@ -426,13 +424,7 @@
             document.getElementById('resultSubtitle').textContent = 
                 `${worstCandidate} 후보는 나와 전혀 다른 길…`;
             
-            // 1순위 설정
-            document.getElementById('firstLabel').textContent = `1순위: ${bestCandidate} 후보`;
-            const progressFill = document.getElementById('resultProgressFill');
-            const progressText = document.getElementById('resultProgressText');
-            progressText.textContent = `${percentage}%`;
-            
-            // 2순위 계산 및 설정
+            // 2순위 계산
             let secondBest = '';
             let secondScore = -1;
             for (let candidate in scores) {
@@ -442,7 +434,18 @@
                 }
             }
             
-            const secondPercentage = Math.round((secondScore / totalQuestions) * 100);
+            // 1순위와 2순위의 점수 합을 기준으로 백분율 계산
+            const totalTopTwo = bestScore + secondScore;
+            const firstPercentage = Math.round((bestScore / totalTopTwo) * 100);
+            const secondPercentage = Math.round((secondScore / totalTopTwo) * 100);
+            
+            // 1순위 설정
+            document.getElementById('firstLabel').textContent = `1순위: ${bestCandidate} 후보`;
+            const progressFill = document.getElementById('resultProgressFill');
+            const progressText = document.getElementById('resultProgressText');
+            progressText.textContent = `${firstPercentage}%`;
+            
+            // 2순위 설정
             document.getElementById('secondLabel').textContent = `2순위: ${secondBest} 후보`;
             const secondProgressFill = document.getElementById('secondProgressFill');
             const secondProgressText = document.getElementById('secondProgressText');
@@ -450,7 +453,7 @@
             
             // 애니메이션
             setTimeout(() => {
-                progressFill.style.width = `${percentage}%`;
+                progressFill.style.width = `${firstPercentage}%`;
                 secondProgressFill.style.width = `${secondPercentage}%`;
             }, 500);
             
