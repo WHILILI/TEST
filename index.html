@@ -295,22 +295,18 @@
         const candidates = {
             "이재명": { 
                 name: "이재명", 
-                percentage: [82, 85, 88, 91, 86, 84, 87, 89],
                 image: "https://raw.githubusercontent.com/WHILILI/TEST/main/lee_jae_myung.jpg"
             },
             "김문수": { 
                 name: "김문수", 
-                percentage: [80, 83, 86, 89, 84, 82, 85, 87],
                 image: "https://raw.githubusercontent.com/WHILILI/TEST/main/kim_moon_soo.jpg"
             },
             "이준석": { 
                 name: "이준석", 
-                percentage: [78, 81, 84, 87, 82, 80, 83, 85],
                 image: "https://raw.githubusercontent.com/WHILILI/TEST/main/lee_jun_seok.jpg"
             },
             "권영국": { 
                 name: "권영국", 
-                percentage: [76, 79, 82, 85, 80, 78, 81, 83],
                 image: "https://raw.githubusercontent.com/WHILILI/TEST/main/kwon_young_guk.jpg"
             }
         };
@@ -390,31 +386,18 @@
                 scores[selectedCandidate]++;
             });
             
-            let maxScore = -1;
-            let minScore = 13;
-            let bestCandidate = '';
-            let worstCandidate = '';
+            // 점수를 내림차순으로 정렬
+            const sortedCandidates = Object.entries(scores).sort((a, b) => b[1] - a[1]);
             
-            for (let candidate in scores) {
-                if (scores[candidate] > maxScore) {
-                    maxScore = scores[candidate];
-                    bestCandidate = candidate;
-                }
-                if (scores[candidate] < minScore) {
-                    minScore = scores[candidate];
-                    worstCandidate = candidate;
-                }
-            }
+            const bestCandidate = sortedCandidates[0][0];
+            const worstCandidate = sortedCandidates[3][0];
             
-            showResult(bestCandidate, worstCandidate);
+            showResult(bestCandidate, worstCandidate, sortedCandidates);
         }
 
-        function showResult(bestCandidate, worstCandidate) {
+        function showResult(bestCandidate, worstCandidate, sortedCandidates) {
             document.getElementById('testHeader').style.display = 'none';
             document.getElementById('testContent').style.display = 'none';
-            
-            // 실제 점수 기반으로 백분율 계산
-            const bestScore = scores[bestCandidate];
             
             const resultImage = document.getElementById('resultImage');
             resultImage.style.backgroundImage = `url('${candidates[bestCandidate].image}')`;
@@ -424,29 +407,21 @@
             document.getElementById('resultSubtitle').textContent = 
                 `${worstCandidate} 후보는 나와 전혀 다른 길…`;
             
-            // 2순위 계산
-            let secondBest = '';
-            let secondScore = -1;
-            for (let candidate in scores) {
-                if (candidate !== bestCandidate && scores[candidate] > secondScore) {
-                    secondScore = scores[candidate];
-                    secondBest = candidate;
-                }
-            }
+            // 전체 12문항 기준으로 백분율 계산
+            const firstScore = sortedCandidates[0][1];
+            const secondScore = sortedCandidates[1][1];
             
-            // 1순위와 2순위의 점수 합을 기준으로 백분율 계산
-            const totalTopTwo = bestScore + secondScore;
-            const firstPercentage = Math.round((bestScore / totalTopTwo) * 100);
-            const secondPercentage = Math.round((secondScore / totalTopTwo) * 100);
+            const firstPercentage = Math.round((firstScore / 12) * 100);
+            const secondPercentage = Math.round((secondScore / 12) * 100);
             
             // 1순위 설정
-            document.getElementById('firstLabel').textContent = `1순위: ${bestCandidate} 후보`;
+            document.getElementById('firstLabel').textContent = `1순위: ${sortedCandidates[0][0]} 후보`;
             const progressFill = document.getElementById('resultProgressFill');
             const progressText = document.getElementById('resultProgressText');
             progressText.textContent = `${firstPercentage}%`;
             
             // 2순위 설정
-            document.getElementById('secondLabel').textContent = `2순위: ${secondBest} 후보`;
+            document.getElementById('secondLabel').textContent = `2순위: ${sortedCandidates[1][0]} 후보`;
             const secondProgressFill = document.getElementById('secondProgressFill');
             const secondProgressText = document.getElementById('secondProgressText');
             secondProgressText.textContent = `${secondPercentage}%`;
