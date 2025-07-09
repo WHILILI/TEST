@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>미니게임 컬렉션 | WHILILI</title>
+  <title>헛둘셋넷의 월드 | WHILILI</title>
   <style>
     :root {
       --bg1: #fdfbff;
@@ -15,7 +15,8 @@
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(130deg, var(--bg1), var(--bg2), var(--bg3));
       background-size: 400% 400%;
@@ -27,6 +28,7 @@
       align-items: center;
       justify-content: flex-start;
       overflow: hidden;
+      position: relative;
     }
     @keyframes bgMove {
       0% { background-position: 0% 50%; }
@@ -34,17 +36,19 @@
       100% { background-position: 0% 50%; }
     }
     h1 {
-      margin: 30px 0 8px;
-      font-size: 44px;
+      margin: 20px 0 10px;
+      font-size: 48px;
       color: var(--accent);
       text-align: center;
       user-select: none;
+      z-index: 10;
     }
     #datetime {
       margin-bottom: 20px;
       font-size: 16px;
       color: #555555;
       user-select: none;
+      z-index: 10;
     }
     #grid {
       display: grid;
@@ -52,7 +56,8 @@
       gap: 20px;
       width: 90vw;
       max-width: 1000px;
-      padding-bottom: 60px;
+      padding-bottom: 80px;
+      z-index: 10;
     }
     button.game {
       display: flex;
@@ -83,6 +88,7 @@
       height: 100%;
       border: none;
       display: none;
+      z-index: 10;
     }
     body.playing h1,
     body.playing #grid,
@@ -102,20 +108,98 @@
       color: #666666;
       pointer-events: none;
       user-select: none;
+      z-index: 10;
     }
     body.playing footer { display: none; }
+
+    #backBtn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 2000;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #0077ff;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #character {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 140px;
+      height: 140px;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+      user-select: none;
+      pointer-events: none;
+      animation: floatAnim 3s ease-in-out infinite;
+    }
+
+    @keyframes floatAnim {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+      50% { transform: translate(-50%, -50%) translateY(-15px); }
+    }
+
+    /* 고양이 간단 SVG 스타일 */
+    #character svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+    }
+
+    #adBanner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 68px;
+      background: #fff;
+      border-top: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #666;
+      z-index: 1500;
+    }
   </style>
 </head>
 <body>
-  <h1>🎮 미니게임 컬렉션</h1>
+  <button id="backBtn">← 뒤로가기</button>
+
+  <div id="character" aria-label="귀여운 고양이 캐릭터">
+    <!-- 귀여운 고양이 SVG 애니메이션 -->
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" >
+      <g>
+        <circle cx="32" cy="32" r="30" fill="#FFCC99" />
+        <circle cx="20" cy="24" r="6" fill="#fff"/>
+        <circle cx="44" cy="24" r="6" fill="#fff"/>
+        <circle cx="20" cy="24" r="3" fill="#000"/>
+        <circle cx="44" cy="24" r="3" fill="#000"/>
+        <path d="M20 36 Q32 46 44 36" stroke="#000" stroke-width="2" fill="none" />
+        <path d="M18 12 L24 18 L30 12" fill="#FF9966"/>
+        <path d="M46 12 L40 18 L34 12" fill="#FF9966"/>
+      </g>
+      <animateTransform attributeName="transform" attributeType="XML"
+        type="rotate" from="-5 32 32" to="5 32 32" dur="2s" repeatCount="indefinite"/>
+    </svg>
+  </div>
+
+  <h1>헛둘셋넷의 월드</h1>
   <div id="datetime"></div>
   <div id="grid"></div>
   <iframe id="loader" src="" scrolling="no"></iframe>
   <footer id="copyright"></footer>
+  <div id="adBanner">[TEST 광고 배너]</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCu11iqjyQ0uvq8ikIE5jnW7tB8cCPf5DA",
@@ -129,6 +213,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    signInAnonymously(getAuth(app)).catch(e => console.error('익명 로그인 실패', e));
 
     var games = [
       { title: '눈알 퀴즈', file: '눈알퀴즈.html', icon: '👁️' },
@@ -158,7 +243,7 @@
 
     async function recordClick(title) {
       try {
-        const docRef = doc(db, "clickCounts", title);
+        const docRef = doc(db, "game_clicks", title);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -186,13 +271,18 @@
 
     function updateDateTime() {
       var now = new Date();
-      var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short', hour12: false, timeZone: 'Asia/Seoul' };
+      var options = {
+        year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        weekday: 'short', hour12: false, timeZone: 'Asia/Seoul'
+      };
       document.getElementById('datetime').textContent = now.toLocaleString('ko-KR', options);
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
     document.getElementById('copyright').textContent = '© 2025 WHILILI. All rights reserved.';
+    document.getElementById('backBtn').onclick = () => location.href = 'https://whilili.github.io/TEST/';
   </script>
 </body>
 </html>
