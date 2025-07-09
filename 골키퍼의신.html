@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>골키퍼의 신</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #90EE90 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .field {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(180deg, #228B22 0%, #006400 100%);
+            border-top: 3px solid white;
+        }
+
+        .goal {
+            position: absolute;
+            bottom: 200px;
+            left: 30%;
+            width: 40%;
+            height: 200px;
+            border: 5px solid white;
+            border-bottom: none;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .goalpost-left, .goalpost-right {
+            position: absolute;
+            top: -5px;
+            width: 10px;
+            height: 210px;
+            background: white;
+        }
+
+        .goalpost-left {
+            left: -10px;
+        }
+
+        .goalpost-right {
+            right: -10px;
+        }
+
+        .crossbar {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: 10px;
+            background: white;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .title {
+            font-size: 2em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            font-size: 1.2em;
+        }
+
+        .goalkeeper {
+            position: absolute;
+            bottom: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4em;
+            transition: all 0.2s ease;
+            z-index: 20;
+            cursor: pointer;
+        }
+
+        .goalkeeper.diving-left {
+            transform: translateX(-50%) translateX(-100px) rotate(-30deg);
+        }
+
+        .goalkeeper.diving-right {
+            transform: translateX(-50%) translateX(100px) rotate(30deg);
+        }
+
+        .goalkeeper.jumping {
+            transform: translateX(-50%) translateY(-50px) scale(1.2);
+        }
+
+        .ball {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            z-index: 15;
+            transition: all 0.1s linear;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .soccer-ball {
+            background: radial-gradient(circle, white 30%, black 35%, black 40%, white 45%);
+        }
+
+        .fire-ball {
+            background: radial-gradient(circle, #FF4500 0%, #FF0000 100%);
+            animation: fireBall 0.3s ease-in-out infinite alternate;
+        }
+
+        @keyframes fireBall {
+            0% { box-shadow: 0 0 20px #FF4500; }
+            100% { box-shadow: 0 0 40px #FF0000, 0 0 60px #FF4500; }
+        }
+
+        .ice-ball {
+            background: radial-gradient(circle, #E0FFFF 0%, #4682B4 100%);
+            animation: iceBall 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes iceBall {
+            0% { box-shadow: 0 0 15px #87CEEB; }
+            100% { box-shadow: 0 0 25px #4682B4; }
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .key-display {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .key {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            transition: all 0.2s ease;
+        }
+
+        .key.pressed {
+            background: rgba(255, 215, 0, 0.5);
+            border-color: #FFD700;
+            transform: scale(1.1);
+        }
+
+        .items-panel {
+            position: absolute;
+            top: 120px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 50;
+            min-width: 200px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .item.active {
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid #FFD700;
+        }
+
+        .item.cooldown {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .item-icon {
+            font-size: 1.5em;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .item-cooldown {
+            font-size: 0.8em;
+            color: #FFD700;
+        }
+
+        .shield {
+            position: absolute;
+            bottom: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6em;
+            z-index: 25;
+            animation: shieldGlow 1s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes shieldGlow {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; filter: drop-shadow(0 0 20px #4682B4); }
+        }
+
+        .giant-gloves {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8em;
+            z-index: 25;
+            animation: glovesGlow 0.8s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes glovesGlow {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; filter: drop-shadow(0 0 15px #FFD700); }
+        }
+
+        .slow-field {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
+            z-index: 5;
+            animation: slowFieldPulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes slowFieldPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .explosion {
+            position: absolute;
+            font-size: 4em;
+            z-index: 30;
+            animation: explode 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes explode {
+            0% { 
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: scale(2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .score-popup {
+            position: absolute;
+            font-size: 2em;
+            font-weight: bold;
+            color: #FFD700;
+            z-index: 40;
+            animation: scoreFloat 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes scoreFloat {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #FFD700;
+            text-align: center;
+            z-index: 200;
+            display: none;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: black;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .wave-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 150;
+            animation: waveAnnounce 3s ease-out forwards;
+            display: none;
+        }
+
+        @keyframes waveAnnounce {
+            0% { 
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            30% { 
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            70% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .goalkeeper {
+                font-size: 3em;
+            }
+            
+            .items-panel {
+                right: 10px;
+                min-width: 150px;
+                padding: 15px;
+            }
+            
+            .item {
+                padding: 8px;
+            }
+            
+            .stats {
+                gap: 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="hud">
+            <div class="title">⚽ 골키퍼의 신 🥅</div>
+            <div class="stats">
+                <div>웨이브: <span id="wave">1</span></div>
+                <div>세이브: <span id="saves">0</span></div>
+                <div>점수: <span id="score">0</span></div>
+                <div>생명: <span id="lives">3</span>❤️</div>
+            </div>
+        </div>
+
+        <div class="field"></div>
+        
+        <div class="goal">
+            <div class="goalpost-left"></div>
+            <div class="goalpost-right"></div>
+            <div class="crossbar"></div>
+        </div>
+
+        <div class="goalkeeper" id="goalkeeper">🧤</div>
+
+        <div class="items-panel">
+            <div style="margin-bottom: 15px; font-weight: bold; color: #FFD700;">아이템</div>
+            <div class="item" onclick="useItem('shield')" id="shield-item">
+                <div class="item-icon">🛡️</div>
+                <div class="item-info">
+                    <div class="item-name">방패</div>
+                    <div class="item-cooldown" id="shield-cooldown">준비됨</div>
+                </div>
+            </div>
+            <div class="item" onclick="useItem('gloves')" id="gloves-item">
+                <div class="item-icon">🧤</div>
+                <div class="item-info">
+                    <div class="item-name">거대 장갑</div>
+                    <div class="item-cooldown" id="gloves-cooldown">준비됨</div>
+                </div>
+            </div>
+            <div class="item" onclick="useItem('slow')" id="slow-item">
+                <div class="item-icon">❄️</div>
+                <div class="item-info">
+                    <div class="item-name">시간 정지</div>
+                    <div class="item-cooldown" id="slow-cooldown">준비됨</div>
+                </div>
+            </div>
+            <div class="item" onclick="useItem('teleport')" id="teleport-item">
+                <div class="item-icon">⚡</div>
+                <div class="item-info">
+                    <div class="item-name">순간이동</div>
+                    <div class="item-cooldown" id="teleport-cooldown">준비됨</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="key-display">
+                <div class="key" id="left-key">← A</div>
+                <div class="key" id="up-key">↑ W</div>
+                <div class="key" id="right-key">→ D</div>
+            </div>
+            <div>좌우 다이빙, 위 점프 / 숫자키로 아이템 사용</div>
+        </div>
+
+        <div class="wave-indicator" id="wave-indicator">웨이브 1</div>
+
+        <div class="game-over" id="game-over">
+            <h2 style="color: #FFD700;">게임 종료!</h2>
+            <p>최종 웨이브: <span id="final-wave">1</span></p>
+            <p>총 세이브: <span id="final-saves">0</span></p>
+            <p>최종 점수: <span id="final-score">0</span></p>
+            <button class="btn" onclick="restartGame()">다시 시작</button>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            isPlaying: false,
+            wave: 1,
+            saves: 0,
+            score: 0,
+            lives: 3,
+            balls: [],
+            activeItems: {},
+            itemCooldowns: {},
+            waveInProgress: false
+        };
+
+        let keys = {
+            left: false,
+            right: false,
+            up: false
+        };
+
+        const ballTypes = [
+            { emoji: '⚽', speed: 3, points: 10, name: 'soccer' },
+            { emoji: '🏀', speed: 4, points: 15, name: 'basketball' },
+            { emoji: '🏈', speed: 5, points: 20, name: 'football' },
+            { emoji: '🎾', speed: 6, points: 25, name: 'tennis' },
+            { emoji: '🏐', speed: 4, points: 15, name: 'volleyball' },
+            { emoji: '🥎', speed: 7, points: 30, name: 'softball' },
+            { emoji: '🔥', speed: 8, points: 40, name: 'fire', class: 'fire-ball' },
+            { emoji: '❄️', speed: 2, points: 35, name: 'ice', class: 'ice-ball' },
+            { emoji: '💣', speed: 5, points: 50, name: 'bomb' },
+            { emoji: '⚡', speed: 10, points: 60, name: 'lightning' }
+        ];
+
+        const items = {
+            shield: { name: '방패', cooldown: 10000, duration: 5000 },
+            gloves: { name: '거대 장갑', cooldown: 15000, duration: 8000 },
+            slow: { name: '시간 정지', cooldown: 20000, duration: 3000 },
+            teleport: { name: '순간이동', cooldown: 8000, duration: 0 }
+        };
+
+        function startGame() {
+            gameState.isPlaying = true;
+            gameState.wave = 1;
+            gameState.saves = 0;
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.balls = [];
+            gameState.activeItems = {};
+            gameState.itemCooldowns = {};
+            
+            document.getElementById('game-over').style.display = 'none';
+            updateHUD();
+            startWave();
+        }
+
+        function startWave() {
+            if (gameState.waveInProgress) return;
+            
+            gameState.waveInProgress = true;
+            showWaveIndicator();
+            
+            setTimeout(() => {
+                spawnWaveBalls();
+                gameState.waveInProgress = false;
+            }, 3000);
+        }
+
+        function showWaveIndicator() {
+            const indicator = document.getElementById('wave-indicator');
+            indicator.textContent = `웨이브 ${gameState.wave}`;
+            indicator.style.display = 'block';
+            indicator.style.animation = 'none';
+            indicator.offsetHeight;
+            indicator.style.animation = 'waveAnnounce 3s ease-out forwards';
+            
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 3000);
+        }
+
+        function spawnWaveBalls() {
+            const ballCount = Math.min(3 + gameState.wave, 12);
+            const spawnInterval = Math.max(500, 2000 - gameState.wave * 100);
+            
+            let spawned = 0;
+            const spawnTimer = setInterval(() => {
+                if (spawned >= ballCount || !gameState.isPlaying) {
+                    clearInterval(spawnTimer);
+                    return;
+                }
+                
+                spawnBall();
+                spawned++;
+            }, spawnInterval);
+        }
+
+        function spawnBall() {
+            const ballType = ballTypes[Math.floor(Math.random() * Math.min(ballTypes.length, 4 + Math.floor(gameState.wave / 2)))];
+            
+            const ball = document.createElement('div');
+            ball.className = `ball ${ballType.class || 'soccer-ball'}`;
+            ball.textContent = ballType.emoji;
+            ball.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+            ball.style.top = '-40px';
+            
+            ball.ballData = {
+                type: ballType,
+                speed: ballType.speed + Math.random() * 2,
+                direction: { x: (Math.random() - 0.5) * 2, y: 1 }
+            };
+            
+            document.querySelector('.game-container').appendChild(ball);
+            gameState.balls.push(ball);
+        }
+
+        function updateBalls() {
+            if (!gameState.isPlaying) return;
+            
+            const slowFactor = gameState.activeItems.slow ? 0.3 : 1;
+            
+            gameState.balls.forEach((ball, index) => {
+                const data = ball.ballData;
+                const currentTop = parseFloat(ball.style.top);
+                const currentLeft = parseFloat(ball.style.left);
+                
+                const newTop = currentTop + (data.speed * data.direction.y * slowFactor);
+                const newLeft = currentLeft + (data.speed * data.direction.x * slowFactor);
+                
+                ball.style.top = newTop + 'px';
+                ball.style.left = newLeft + 'px';
+                
+                if (newTop > window.innerHeight) {
+                    ball.parentNode.removeChild(ball);
+                    gameState.balls.splice(index, 1);
+                    
+                    if (data.type.name !== 'ice') {
+                        loseLife();
+                    }
+                    
+                    checkWaveComplete();
+                }
+                
+                checkBallSave(ball, index);
+            });
+        }
+
+        function checkBallSave(ball, index) {
+            const ballRect = ball.getBoundingClientRect();
+            const goalRect = document.querySelector('.goal').getBoundingClientRect();
+            const goalkeeper = document.getElementById('goalkeeper');
+            const keeperRect = goalkeeper.getBoundingClientRect();
+            
+            const saveDistance = gameState.activeItems.gloves ? 120 : 80;
+            const shieldActive = gameState.activeItems.shield;
+            
+            if (ballRect.bottom >= goalRect.top && ballRect.bottom <= goalRect.bottom + 50 &&
+                ballRect.left < goalRect.right && ballRect.right > goalRect.left) {
+                
+                const distance = Math.sqrt(
+                    Math.pow(ballRect.left - keeperRect.left, 2) + 
+                    Math.pow(ballRect.top - keeperRect.top, 2)
+                );
+                
+                if (distance < saveDistance || shieldActive) {
+                    saveBall(ball, index);
+                }
+            }
+        }
+
+        function saveBall(ball, index) {
+            const data = ball.ballData;
+            gameState.saves++;
+            gameState.score += data.type.points * gameState.wave;
+            
+            createExplosion(ball.style.left, ball.style.top);
+            createScorePopup(ball.style.left, ball.style.top, `+${data.type.points * gameState.wave}`);
+            
+            if (data.type.name === 'bomb') {
+                gameState.score += 100;
+                createExplosion(ball.style.left, ball.style.top, '💥');
+            }
+            
+            ball.parentNode.removeChild(ball);
+            gameState.balls.splice(index, 1);
+            
+            updateHUD();
+            checkWaveComplete();
+        }
+
+        function loseLife() {
+            gameState.lives--;
+            updateHUD();
+            
+            if (gameState.lives <= 0) {
+                gameOver();
+            }
+        }
+
+        function checkWaveComplete() {
+            if (gameState.balls.length === 0 && !gameState.waveInProgress && gameState.isPlaying) {
+                gameState.wave++;
+                gameState.score += 100 * gameState.wave;
+                updateHUD();
+                
+                setTimeout(() => {
+                    startWave();
+                }, 2000);
+            }
+        }
+
+        function useItem(itemType) {
+            if (!gameState.isPlaying || gameState.itemCooldowns[itemType]) return;
+            
+            const item = items[itemType];
+            gameState.itemCooldowns[itemType] = true;
+            
+            switch (itemType) {
+                case 'shield':
+                    activateShield();
+                    break;
+                case 'gloves':
+                    activateGloves();
+                    break;
+                case 'slow':
+                    activateSlowTime();
+                    break;
+                case 'teleport':
+                    activateTeleport();
+                    break;
+            }
+            
+            updateItemCooldowns();
+            
+            setTimeout(() => {
+                gameState.itemCooldowns[itemType] = false;
+                updateItemCooldowns();
+            }, item.cooldown);
+        }
+
+        function activateShield() {
+            gameState.activeItems.shield = true;
+            
+            const shield = document.createElement('div');
+            shield.className = 'shield';
+            shield.textContent = '🛡️';
+            document.querySelector('.game-container').appendChild(shield);
+            
+            setTimeout(() => {
+                gameState.activeItems.shield = false;
+                if (shield.parentNode) {
+                    shield.parentNode.removeChild(shield);
+                }
+            }, items.shield.duration);
+        }
+
+        function activateGloves() {
+            gameState.activeItems.gloves = true;
+            
+            const gloves = document.createElement('div');
+            gloves.className = 'giant-gloves';
+            gloves.textContent = '🧤';
+            document.querySelector('.game-container').appendChild(gloves);
+            
+            setTimeout(() => {
+                gameState.activeItems.gloves = false;
+                if (gloves.parentNode) {
+                    gloves.parentNode.removeChild(gloves);
+                }
+            }, items.gloves.duration);
+        }
+
+        function activateSlowTime() {
+            gameState.activeItems.slow = true;
+            
+            const slowField = document.createElement('div');
+            slowField.className = 'slow-field';
+            document.querySelector('.game-container').appendChild(slowField);
+            
+            setTimeout(() => {
+                gameState.activeItems.slow = false;
+                if (slowField.parentNode) {
+                    slowField.parentNode.removeChild(slowField);
+                }
+            }, items.slow.duration);
+        }
+
+        function activateTeleport() {
+            const goalkeeper = document.getElementById('goalkeeper');
+            goalkeeper.style.left = Math.random() * 40 + 30 + '%';
+            
+            createExplosion(goalkeeper.style.left, '400px', '⚡');
+        }
+
+        function updateItemCooldowns() {
+            Object.keys(items).forEach(itemType => {
+                const element = document.getElementById(`${itemType}-item`);
+                const cooldownElement = document.getElementById(`${itemType}-cooldown`);
+                
+                if (gameState.itemCooldowns[itemType]) {
+                    element.classList.add('cooldown');
+                    cooldownElement.textContent = '쿨다운 중...';
+                } else {
+                    element.classList.remove('cooldown');
+                    cooldownElement.textContent = '준비됨';
+                }
+            });
+        }
+
+        function createExplosion(x, y, emoji = '💥') {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.textContent = emoji;
+            explosion.style.left = x;
+            explosion.style.top = y;
+            document.querySelector('.game-container').appendChild(explosion);
+            
+            setTimeout(() => {
+                if (explosion.parentNode) {
+                    explosion.parentNode.removeChild(explosion);
+                }
+            }, 1000);
+        }
+
+        function createScorePopup(x, y, text) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup';
+            popup.textContent = text;
+            popup.style.left = x;
+            popup.style.top = y;
+            document.querySelector('.game-container').appendChild(popup);
+            
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.parentNode.removeChild(popup);
+                }
+            }, 2000);
+        }
+
+        function moveGoalkeeper() {
+            const goalkeeper = document.getElementById('goalkeeper');
+            goalkeeper.className = 'goalkeeper';
+            
+            if (keys.left) {
+                goalkeeper.classList.add('diving-left');
+                const currentLeft = parseFloat(goalkeeper.style.left) || 50;
+                goalkeeper.style.left = Math.max(30, currentLeft - 2) + '%';
+            }
+            
+            if (keys.right) {
+                goalkeeper.classList.add('diving-right');
+                const currentLeft = parseFloat(goalkeeper.style.left) || 50;
+                goalkeeper.style.left = Math.min(70, currentLeft + 2) + '%';
+            }
+            
+            if (keys.up) {
+                goalkeeper.classList.add('jumping');
+            }
+        }
+
+        function gameOver() {
+            gameState.isPlaying = false;
+            
+            document.getElementById('final-wave').textContent = gameState.wave;
+            document.getElementById('final-saves').textContent = gameState.saves;
+            document.getElementById('final-score').textContent = gameState.score;
+            document.getElementById('game-over').style.display = 'block';
+            
+            gameState.balls.forEach(ball => {
+                if (ball.parentNode) {
+                    ball.parentNode.removeChild(ball);
+                }
+            });
+            gameState.balls = [];
+        }
+
+        function restartGame() {
+            document.getElementById('game-over').style.display = 'none';
+            startGame();
+        }
+
+        function updateHUD() {
+            document.getElementById('wave').textContent = gameState.wave;
+            document.getElementById('saves').textContent = gameState.saves;
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('lives').textContent = gameState.lives;
+        }
+
+        function handleKeyDown(event) {
+            switch (event.key.toLowerCase()) {
+                case 'a':
+                case 'arrowleft':
+                    keys.left = true;
+                    document.getElementById('left-key').classList.add('pressed');
+                    event.preventDefault();
+                    break;
+                case 'd':
+                case 'arrowright':
+                    keys.right = true;
+                    document.getElementById('right-key').classList.add('pressed');
+                    event.preventDefault();
+                    break;
+                case 'w':
+                case 'arrowup':
+                    keys.up = true;
+                    document.getElementById('up-key').classList.add('pressed');
+                    event.preventDefault();
+                    break;
+                case '1':
+                    useItem('shield');
+                    break;
+                case '2':
+                    useItem('gloves');
+                    break;
+                case '3':
+                    useItem('slow');
+                    break;
+                case '4':
+                    useItem('teleport');
+                    break;
+            }
+        }
+
+        function handleKeyUp(event) {
+            switch (event.key.toLowerCase()) {
+                case 'a':
+                case 'arrowleft':
+                    keys.left = false;
+                    document.getElementById('left-key').classList.remove('pressed');
+                    event.preventDefault();
+                    break;
+                case 'd':
+                case 'arrowright':
+                    keys.right = false;
+                    document.getElementById('right-key').classList.remove('pressed');
+                    event.preventDefault();
+                    break;
+                case 'w':
+                case 'arrowup':
+                    keys.up = false;
+                    document.getElementById('up-key').classList.remove('pressed');
+                    event.preventDefault();
+                    break;
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        setInterval(() => {
+            if (gameState.isPlaying) {
+                updateBalls();
+                moveGoalkeeper();
+            }
+        }, 50);
+
+        startGame();
+    </script>
+</body>
+</html>
