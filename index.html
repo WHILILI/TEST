@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>미니게임 컬렉션 | WHILILI</title>
   <style>
-    :root { --bg1:#fdfbff;--bg2:#e9f7ff;--bg3:#d3edff;--fg:#222;--card:#fff;--accent:#0077ff; }
+    :root{--bg1:#fdfbff;--bg2:#e9f7ff;--bg3:#d3edff;--fg:#222;--card:#fff;--accent:#0077ff}
     *{box-sizing:border-box}
     body{margin:0;padding:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(130deg,var(--bg1),var(--bg2),var(--bg3));background-size:400% 400%;animation:bgMove 25s ease infinite;color:var(--fg);height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden}
     @keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
@@ -20,12 +20,9 @@
     body.playing #loader{display:block}
     footer{position:fixed;bottom:8px;left:0;width:100%;text-align:center;font-size:14px;color:#666;pointer-events:none;user-select:none;z-index:1}
     body.playing footer{display:none}
-    /* back button */
     #back-btn{position:fixed;top:16px;left:16px;background:#ffffffcc;color:var(--accent);border:none;border-radius:8px;padding:8px 14px;font-size:16px;font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;z-index:1000;display:none;user-select:none}
     body.playing #back-btn{display:block}
-    /* test ad */
     #test-ad{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);width:320px;height:50px;background:#0077ff;color:#fff;font-weight:bold;font-size:18px;display:flex;justify-content:center;align-items:center;border-radius:8px;box-shadow:0 3px 6px rgba(0,0,0,.3);user-select:none;z-index:1000}
-    /* character */
     #character{position:relative;width:120px;height:140px;margin:20px 0 0;z-index:10;perspective:800px;user-select:none}
     #character .body{width:100px;height:120px;background:linear-gradient(135deg,#ffd966,#f4b942);border-radius:50% 50% 40% 40%/60% 60% 40% 40%;margin:0 auto;box-shadow:0 8px 12px rgba(0,0,0,.15);animation:body-bounce 2.4s ease-in-out infinite}
     #character .eye{position:absolute;top:40px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
@@ -42,19 +39,26 @@
   <button id="back-btn" onclick="location.href='https://whilili.github.io/TEST/'">← Back</button>
   <h1>🎮 미니게임 컬렉션</h1>
   <div id="character">
-    <div class="body">
-      <div class="eye left"><div class="pupil"></div></div>
-      <div class="eye right"><div class="pupil"></div></div>
-      <div class="mouth"></div>
-    </div>
+    <div class="body"><div class="eye left"><div class="pupil"></div></div><div class="eye right"><div class="pupil"></div></div><div class="mouth"></div></div>
   </div>
   <div id="datetime"></div>
   <div id="grid"></div>
   <iframe id="loader" src="" scrolling="no"></iframe>
   <div id="test-ad">테스트 광고 영역</div>
   <footer id="copyright"></footer>
-  <script>
-    var games=[
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+
+    const config={apiKey:'AIzaSyCu11iqjyQ0uvq8ikIE5jnW7tB8cCPf5DA',authDomain:'test-2986a.firebaseapp.com',projectId:'test-2986a',storageBucket:'test-2986a.appspot.com',messagingSenderId:'774502147365',appId:'1:774502147365:web:eab2dddc3ec86642e6a6cc',measurementId:'G-E6D45R514C'};
+    const app=initializeApp(config);
+    const db=getFirestore(app);
+
+    // 첫 방문 시 메인 화면 클릭 수 1 증가
+    recordClick('메인 화면');
+
+    const games=[
       {title:'눈알 퀴즈',file:'눈알퀴즈.html',icon:'👁️'},
       {title:'눈썰미 게임',file:'눈썰미퀴즈.html',icon:'👀'},
       {title:'그림자 퀴즈',file:'그림자퀴즈.html',icon:'🕶️'},
@@ -65,15 +69,30 @@
       {title:'댄스 챌린지',file:'댄스챌린지.html',icon:'💃'},
       {title:'번개 피하기',file:'번개피하기.html',icon:'⚡'},
       {title:'고양이는 어디에',file:'고양이는어디에.html',icon:'🐱'},
-      {title:'골키퍼의 신',file:'골키퍼의신.html',icon:'🧤'}
-    ];
-    var grid=document.getElementById('grid');
-    var loader=document.getElementById('loader');
-    var current='';
-    function loadGame(file){
-      if(file!==current){loader.src=file;current=file;document.body.classList.add('playing');}}
-    games.forEach(function(g){var b=document.createElement('button');b.className='game';b.innerHTML=`<span class='icon'>${g.icon}</span>${g.title}`;b.onclick=function(){loadGame(g.file)};grid.appendChild(b);});
-    function updateDateTime(){var now=new Date();var options={year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short',hour12:false,timeZone:'Asia/Seoul'};document.getElementById('datetime').textContent=now.toLocaleString('ko-KR',options);}setInterval(updateDateTime,1000);updateDateTime();
+      {title:'골키퍼의 신',file:'골키퍼의신.html',icon:'🧤'}];
+
+    const grid=document.getElementById('grid');
+    const loader=document.getElementById('loader');
+    let current='';
+
+    async function recordClick(title){
+      const ref=doc(db,'clickCounts',title);
+      const snap=await getDoc(ref);
+      if(snap.exists()){
+        await updateDoc(ref,{count:increment(1)});
+      }else{
+        await setDoc(ref,{count:1});
+      }
+    }
+
+    function loadGame(file,title){
+      if(file!==current){loader.src=file;current=file;document.body.classList.add('playing');recordClick(title);} }
+
+    games.forEach(g=>{
+      const b=document.createElement('button');b.className='game';b.innerHTML=`<span class='icon'>${g.icon}</span>${g.title}`;b.onclick=()=>loadGame(g.file,g.title);grid.appendChild(b);} );
+
+    function updateDateTime(){const now=new Date();const opt={year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short',hour12:false,timeZone:'Asia/Seoul'};document.getElementById('datetime').textContent=now.toLocaleString('ko-KR',opt);} setInterval(updateDateTime,1000);updateDateTime();
+
     document.getElementById('copyright').textContent='© 2025 WHILILI. All rights reserved.';
   </script>
 </body>
