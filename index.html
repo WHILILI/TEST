@@ -113,7 +113,28 @@
   <div id="grid"></div>
   <iframe id="loader" src="" scrolling="no"></iframe>
   <footer id="copyright"></footer>
+
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
   <script>
+    // Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyCu11iqjyQ0uvq8ikIE5jnW7tB8cCPf5DA",
+      authDomain: "test-2986a.firebaseapp.com",
+      projectId: "test-2986a",
+      storageBucket: "test-2986a.appspot.com",
+      messagingSenderId: "774502147365",
+      appId: "1:774502147365:web:eab2dddc3ec86642e6a6cc",
+      measurementId: "G-E6D45R514C"
+    };
+
+    // Firebase 초기화
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     var games = [
       { title: '눈알 퀴즈', file: '눈알퀴즈.html', icon: '👁️' },
       { title: '눈썰미 게임', file: '눈썰미퀴즈.html', icon: '👀' },
@@ -132,11 +153,30 @@
     var loader = document.getElementById('loader');
     var current = '';
 
-    function loadGame(file) {
+    async function incrementClickCount(gameTitle) {
+      const docRef = db.collection('game_clicks').doc(gameTitle);
+      try {
+        await db.runTransaction(async (transaction) => {
+          const doc = await transaction.get(docRef);
+          if (!doc.exists) {
+            transaction.set(docRef, { count: 1 });
+          } else {
+            const newCount = (doc.data().count || 0) + 1;
+            transaction.update(docRef, { count: newCount });
+          }
+        });
+        console.log(`'${gameTitle}' 클릭 수가 증가했습니다.`);
+      } catch (e) {
+        console.error('클릭 수 증가 실패:', e);
+      }
+    }
+
+    function loadGame(file, title) {
       if (file !== current) {
         loader.src = file;
         current = file;
         document.body.classList.add('playing');
+        incrementClickCount(title);
       }
     }
 
@@ -144,7 +184,7 @@
       var b = document.createElement('button');
       b.className = 'game';
       b.innerHTML = `<span class='icon'>${g.icon}</span>${g.title}`;
-      b.onclick = function () { loadGame(g.file); };
+      b.onclick = function () { loadGame(g.file, g.title); };
       grid.appendChild(b);
     });
 
