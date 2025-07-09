@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>미니게임 컬렉션 | WHILILI</title>
+  <style>
+    :root {
+      --bg1: #fdfbff;
+      --bg2: #e9f7ff;
+      --bg3: #d3edff;
+      --fg: #222222;
+      --card: #ffffff;
+      --accent: #0077ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(130deg, var(--bg1), var(--bg2), var(--bg3));
+      background-size: 400% 400%;
+      animation: bgMove 25s ease infinite;
+      color: var(--fg);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+    @keyframes bgMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    h1 {
+      margin: 30px 0 8px;
+      font-size: 44px;
+      color: var(--accent);
+      text-align: center;
+      user-select: none;
+    }
+    #datetime {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #555555;
+      user-select: none;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+      width: 90vw;
+      max-width: 1000px;
+      padding-bottom: 60px;
+    }
+    button.game {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--card);
+      border: none;
+      border-radius: 14px;
+      padding: 24px;
+      font-size: 18px;
+      color: var(--fg);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    button.game span.icon {
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+    button.game:hover {
+      background: #f0f9ff;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    #loader {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none;
+    }
+    body.playing h1,
+    body.playing #grid,
+    body.playing #datetime {
+      display: none;
+    }
+    body.playing #loader {
+      display: block;
+    }
+    footer {
+      position: fixed;
+      bottom: 8px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      color: #666666;
+      pointer-events: none;
+      user-select: none;
+    }
+    body.playing footer { display: none; }
+  </style>
+</head>
+<body>
+  <h1>🎮 미니게임 컬렉션</h1>
+  <div id="datetime"></div>
+  <div id="grid"></div>
+  <iframe id="loader" src="" scrolling="no"></iframe>
+  <footer id="copyright"></footer>
+  <script>
+    var games = [
+      { title: '눈알 퀴즈', file: '눈알퀴즈.html', icon: '👁️' },
+      { title: '눈썰미 게임', file: '눈썰미게임.html', icon: '👀' },
+      { title: '그림자 퀴즈', file: '그림자퀴즈.html', icon: '🕶️' },
+      { title: '미로 찾기', file: '미로찾기.html', icon: '🧭' },
+      { title: '크레이지 낚시왕', file: '크레이지낚시왕.html', icon: '🎣' },
+      { title: '이상한 야구', file: '이상한야구l.html', icon: '⚾' },
+      { title: '공포의 외발자전거', file: '공포의외발자전거.html', icon: '🚴' },
+      { title: '댄스 챌린지', file: '댄스챌린지.html', icon: '💃' },
+      { title: '번개 피하기', file: '번개피하기.html', icon: '⚡' },
+      { title: '고양이는 어디에', file: '고양이는어디에.html', icon: '🐱' },
+      { title: '골키퍼의 신', file: '골키퍼의신.html', icon: '🧤' }
+    ];
+
+    var grid = document.getElementById('grid');
+    var loader = document.getElementById('loader');
+    var current = '';
+
+    function loadGame(file) {
+      if (file !== current) {
+        loader.src = file;
+        current = file;
+        document.body.classList.add('playing');
+      }
+    }
+
+    games.forEach(function (g) {
+      var b = document.createElement('button');
+      b.className = 'game';
+      b.innerHTML = `<span class='icon'>${g.icon}</span>${g.title}`;
+      b.onclick = function () { loadGame(g.file); };
+      grid.appendChild(b);
+    });
+
+    function updateDateTime() {
+      var now = new Date();
+      var options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short', hour12: false, timeZone: 'Asia/Seoul' };
+      document.getElementById('datetime').textContent = now.toLocaleString('ko-KR', options);
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    document.getElementById('copyright').textContent = '© 2025 WHILILI. All rights reserved.';
+  </script>
+</body>
+</html>

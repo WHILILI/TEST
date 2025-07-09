@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동물 눈알 퀴즈</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .eye-container {
+            width: 300px;
+            height: 200px;
+            margin: 0 auto 30px;
+            background: #333;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .eye-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: #4CAF50;
+            border-color: #45a049;
+        }
+
+        .option-btn.incorrect {
+            background: #f44336;
+            border-color: #da190b;
+        }
+
+        .next-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #FF6B6B;
+            color: white;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .next-btn:hover {
+            background: #FF5252;
+            transform: translateY(-2px);
+        }
+
+        .game-over {
+            display: none;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐾 동물 눈알 퀴즈 🐾</h1>
+        
+        <div class="score-board">
+            <div>점수: <span id="score">0</span></div>
+            <div>문제: <span id="current-question">1</span> / <span id="total-questions">10</span></div>
+        </div>
+
+        <div class="eye-container">
+            <canvas id="eye-canvas" class="eye-image" width="300" height="200"></canvas>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="options" id="options">
+            <button class="option-btn" onclick="selectAnswer(0)">고양이</button>
+            <button class="option-btn" onclick="selectAnswer(1)">강아지</button>
+            <button class="option-btn" onclick="selectAnswer(2)">말</button>
+            <button class="option-btn" onclick="selectAnswer(3)">부엉이</button>
+        </div>
+
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">다음 문제</button>
+
+        <div class="game-over" id="game-over">
+            <h2>게임 종료!</h2>
+            <p>최종 점수: <span id="final-score">0</span> / 10</p>
+            <button class="restart-btn" onclick="restartGame()">다시 시작</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let score = 0;
+        let totalQuestions = 10;
+        let questions = [];
+        let gameEnded = false;
+
+        const animals = [
+            { name: '고양이', color: '#FFD700', pupilShape: 'vertical' },
+            { name: '강아지', color: '#8B4513', pupilShape: 'round' },
+            { name: '말', color: '#654321', pupilShape: 'horizontal' },
+            { name: '부엉이', color: '#FFA500', pupilShape: 'round' },
+            { name: '염소', color: '#DEB887', pupilShape: 'horizontal' },
+            { name: '뱀', color: '#FFD700', pupilShape: 'vertical' },
+            { name: '늑대', color: '#4169E1', pupilShape: 'round' },
+            { name: '독수리', color: '#FF4500', pupilShape: 'round' }
+        ];
+
+        function generateQuestions() {
+            questions = [];
+            for (let i = 0; i < totalQuestions; i++) {
+                const correctAnimal = animals[Math.floor(Math.random() * animals.length)];
+                const options = [correctAnimal.name];
+                
+                while (options.length < 4) {
+                    const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+                    if (!options.includes(randomAnimal.name)) {
+                        options.push(randomAnimal.name);
+                    }
+                }
+                
+                for (let j = options.length - 1; j > 0; j--) {
+                    const k = Math.floor(Math.random() * (j + 1));
+                    [options[j], options[k]] = [options[k], options[j]];
+                }
+                
+                questions.push({
+                    animal: correctAnimal,
+                    options: options,
+                    correctAnswer: options.indexOf(correctAnimal.name)
+                });
+            }
+        }
+
+        function drawEye(animal) {
+            const canvas = document.getElementById('eye-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const eyeWidth = 120;
+            const eyeHeight = 80;
+            
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, eyeWidth, eyeHeight, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = animal.color;
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, eyeWidth * 0.8, eyeHeight * 0.8, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            
+            if (animal.pupilShape === 'vertical') {
+                ctx.ellipse(centerX, centerY, 8, 40, 0, 0, 2 * Math.PI);
+            } else if (animal.pupilShape === 'horizontal') {
+                ctx.ellipse(centerX, centerY, 40, 8, 0, 0, 2 * Math.PI);
+            } else {
+                ctx.ellipse(centerX, centerY, 25, 25, 0, 0, 2 * Math.PI);
+            }
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.ellipse(centerX - 10, centerY - 10, 8, 8, 0, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function displayQuestion() {
+            if (currentQuestion >= questions.length) {
+                endGame();
+                return;
+            }
+            
+            const question = questions[currentQuestion];
+            drawEye(question.animal);
+            
+            const optionBtns = document.querySelectorAll('.option-btn');
+            optionBtns.forEach((btn, index) => {
+                btn.textContent = question.options[index];
+                btn.className = 'option-btn';
+                btn.disabled = false;
+            });
+            
+            document.getElementById('current-question').textContent = currentQuestion + 1;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (gameEnded) return;
+            
+            const question = questions[currentQuestion];
+            const optionBtns = document.querySelectorAll('.option-btn');
+            
+            optionBtns.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correctAnswer) {
+                score++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('feedback').textContent = '정답입니다! 🎉';
+                optionBtns[selectedIndex].classList.add('correct');
+            } else {
+                document.getElementById('feedback').textContent = `틀렸습니다. 정답은 ${question.animal.name}입니다.`;
+                optionBtns[selectedIndex].classList.add('incorrect');
+                optionBtns[question.correctAnswer].classList.add('correct');
+            }
+            
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            displayQuestion();
+        }
+
+        function endGame() {
+            gameEnded = true;
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('game-over').style.display = 'block';
+            document.querySelector('.eye-container').style.display = 'none';
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            gameEnded = false;
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('game-over').style.display = 'none';
+            document.querySelector('.eye-container').style.display = 'flex';
+            document.getElementById('options').style.display = 'grid';
+            
+            generateQuestions();
+            displayQuestion();
+        }
+
+        generateQuestions();
+        displayQuestion();
+    </script>
+</body>
+</html>

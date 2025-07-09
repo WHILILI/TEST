@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>눈썰미 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 95%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+
+        .game-area {
+            width: 500px;
+            height: 400px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .shape:hover {
+            transform: scale(1.1);
+        }
+
+        .instructions {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .start-btn, .next-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .start-btn:hover, .next-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .game-over {
+            display: none;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #FF6B6B;
+            color: white;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            background: #FF5252;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            min-height: 30px;
+        }
+
+        .level-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>👁️ 눈썰미 게임 👁️</h1>
+        
+        <div class="score-board">
+            <div>점수: <span id="score">0</span></div>
+            <div>레벨: <span id="level">1</span></div>
+            <div>라이프: <span id="lives">3</span>❤️</div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="level-info">
+            <div>현재 레벨: <span id="current-level-info">1</span> - 변화 찾기</div>
+        </div>
+
+        <div class="timer" id="timer">준비하세요!</div>
+
+        <div class="game-area" id="game-area"></div>
+
+        <div class="instructions" id="instructions">
+            5초 동안 이미지를 기억하세요!<br>
+            그 후 변화된 부분을 찾아 클릭하세요!
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <button class="start-btn" id="start-btn" onclick="startGame()">게임 시작</button>
+        <button class="next-btn" id="next-btn" onclick="nextLevel()" style="display: none;">다음 레벨</button>
+
+        <div class="game-over" id="game-over">
+            <h2>게임 종료!</h2>
+            <p>최종 점수: <span id="final-score">0</span></p>
+            <p>도달한 레벨: <span id="final-level">1</span></p>
+            <button class="restart-btn" onclick="restartGame()">다시 시작</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let gameActive = false;
+        let memoryTime = 5;
+        let currentShapes = [];
+        let changedShapeIndex = -1;
+        let gamePhase = 'ready';
+
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+        const shapes = ['circle', 'square', 'triangle'];
+
+        function createShape(index) {
+            const gameArea = document.getElementById('game-area');
+            const shape = document.createElement('div');
+            shape.classList.add('shape');
+            shape.id = `shape-${index}`;
+            
+            const size = 40 + Math.random() * 40;
+            const x = Math.random() * (500 - size);
+            const y = Math.random() * (400 - size);
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            shape.style.width = size + 'px';
+            shape.style.height = size + 'px';
+            shape.style.left = x + 'px';
+            shape.style.top = y + 'px';
+            shape.style.backgroundColor = color;
+            
+            if (shapeType === 'square') {
+                shape.style.borderRadius = '0';
+            } else if (shapeType === 'triangle') {
+                shape.style.borderRadius = '0';
+                shape.style.width = '0';
+                shape.style.height = '0';
+                shape.style.backgroundColor = 'transparent';
+                shape.style.borderLeft = `${size/2}px solid transparent`;
+                shape.style.borderRight = `${size/2}px solid transparent`;
+                shape.style.borderBottom = `${size}px solid ${color}`;
+            }
+            
+            shape.onclick = () => checkAnswer(index);
+            gameArea.appendChild(shape);
+            
+            return {
+                element: shape,
+                size: size,
+                x: x,
+                y: y,
+                color: color,
+                type: shapeType
+            };
+        }
+
+        function generateLevel() {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            currentShapes = [];
+            
+            const shapeCount = Math.min(3 + Math.floor(level / 2), 8);
+            
+            for (let i = 0; i < shapeCount; i++) {
+                currentShapes.push(createShape(i));
+            }
+        }
+
+        function startMemoryPhase() {
+            gamePhase = 'memory';
+            document.getElementById('instructions').textContent = '이미지를 기억하세요!';
+            document.getElementById('start-btn').style.display = 'none';
+            
+            let timeLeft = memoryTime;
+            const timerElement = document.getElementById('timer');
+            
+            const countdown = setInterval(() => {
+                timerElement.textContent = `기억 시간: ${timeLeft}초`;
+                timeLeft--;
+                
+                if (timeLeft < 0) {
+                    clearInterval(countdown);
+                    startGamePhase();
+                }
+            }, 1000);
+        }
+
+        function startGamePhase() {
+            gamePhase = 'game';
+            gameActive = true;
+            
+            changedShapeIndex = Math.floor(Math.random() * currentShapes.length);
+            const changedShape = currentShapes[changedShapeIndex];
+            
+            const changeType = Math.random();
+            if (changeType < 0.6) {
+                let newColor;
+                do {
+                    newColor = colors[Math.floor(Math.random() * colors.length)];
+                } while (newColor === changedShape.color);
+                
+                changedShape.color = newColor;
+                
+                if (changedShape.type === 'triangle') {
+                    changedShape.element.style.borderBottomColor = newColor;
+                } else {
+                    changedShape.element.style.backgroundColor = newColor;
+                }
+            } else if (changeType < 0.8) {
+                const newSize = changedShape.size + (Math.random() > 0.5 ? 20 : -20);
+                changedShape.size = newSize;
+                
+                if (changedShape.type === 'triangle') {
+                    changedShape.element.style.borderLeftWidth = `${newSize/2}px`;
+                    changedShape.element.style.borderRightWidth = `${newSize/2}px`;
+                    changedShape.element.style.borderBottomWidth = `${newSize}px`;
+                } else {
+                    changedShape.element.style.width = newSize + 'px';
+                    changedShape.element.style.height = newSize + 'px';
+                }
+            } else {
+                const newX = Math.random() * (500 - changedShape.size);
+                const newY = Math.random() * (400 - changedShape.size);
+                changedShape.element.style.left = newX + 'px';
+                changedShape.element.style.top = newY + 'px';
+            }
+            
+            document.getElementById('instructions').textContent = '변화된 부분을 찾아 클릭하세요!';
+            document.getElementById('timer').textContent = '변화를 찾으세요!';
+        }
+
+        function checkAnswer(clickedIndex) {
+            if (!gameActive || gamePhase !== 'game') return;
+            
+            gameActive = false;
+            
+            if (clickedIndex === changedShapeIndex) {
+                score += level * 10;
+                document.getElementById('score').textContent = score;
+                document.getElementById('feedback').textContent = '정답입니다! 🎉';
+                document.getElementById('next-btn').style.display = 'inline-block';
+                
+                currentShapes[clickedIndex].element.style.border = '3px solid #4CAF50';
+                currentShapes[clickedIndex].element.style.boxShadow = '0 0 20px #4CAF50';
+            } else {
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                document.getElementById('feedback').textContent = '틀렸습니다! 💔';
+                
+                currentShapes[clickedIndex].element.style.border = '3px solid #f44336';
+                currentShapes[changedShapeIndex].element.style.border = '3px solid #4CAF50';
+                currentShapes[changedShapeIndex].element.style.boxShadow = '0 0 20px #4CAF50';
+                
+                if (lives <= 0) {
+                    endGame();
+                } else {
+                    setTimeout(() => {
+                        document.getElementById('next-btn').style.display = 'inline-block';
+                    }, 2000);
+                }
+            }
+            
+            updateProgress();
+        }
+
+        function nextLevel() {
+            if (lives <= 0) {
+                endGame();
+                return;
+            }
+            
+            level++;
+            document.getElementById('level').textContent = level;
+            document.getElementById('current-level-info').textContent = level;
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('feedback').textContent = '';
+            
+            if (level % 3 === 0) {
+                memoryTime = Math.max(3, memoryTime - 1);
+            }
+            
+            generateLevel();
+            startMemoryPhase();
+        }
+
+        function updateProgress() {
+            const progress = Math.min((score / (level * 50)) * 100, 100);
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function startGame() {
+            gameActive = false;
+            gamePhase = 'ready';
+            generateLevel();
+            startMemoryPhase();
+        }
+
+        function endGame() {
+            gameActive = false;
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-level').textContent = level;
+            document.getElementById('game-over').style.display = 'block';
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+        }
+
+        function restartGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            memoryTime = 5;
+            gameActive = false;
+            gamePhase = 'ready';
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('current-level-info').textContent = level;
+            document.getElementById('game-over').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('instructions').style.display = 'flex';
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('start-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('timer').textContent = '준비하세요!';
+            document.getElementById('progress-fill').style.width = '0%';
+            
+            document.getElementById('game-area').innerHTML = '';
+        }
+
+        updateProgress();
+    </script>
+</body>
+</html>
