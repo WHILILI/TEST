@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이상한 야구 - 괴상한 배트로 타자되기</title>
+    <title>🤪 이상한 야구왕 ⚾</title>
     <style>
         * {
             margin: 0;
@@ -12,190 +12,287 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(180deg, #87CEEB 0%, #90EE90 100%);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #98FB98 50%, #90EE90 100%);
             min-height: 100vh;
-            color: white;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            padding: 10px;
+            padding-bottom: 70px;
+            overflow-x: hidden;
+            position: relative;
         }
 
         .game-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            border: 3px solid rgba(255, 182, 193, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-        }
-
-        .scoreboard {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-size: 1.2em;
-            z-index: 100;
+            position: relative;
         }
 
-        .title {
+        h1 {
             font-size: 2em;
-            font-weight: bold;
-            color: #FFD700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px;
+            color: #FF69B4;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: crazy-title 3s infinite;
         }
 
-        .stats {
+        @keyframes crazy-title {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(2deg) scale(1.05); }
+            50% { transform: rotate(-2deg) scale(0.95); }
+            75% { transform: rotate(1deg) scale(1.02); }
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .info-item {
+            background: linear-gradient(45deg, #FFE4E1, #F0E68C);
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 2px solid #FFB6C1;
+            color: #FF1493;
+        }
+
+        .strikes-display {
             display: flex;
-            gap: 30px;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .strike {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid #FF6347;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .strike.active {
+            background: #FF6347;
+            color: white;
+            animation: strike-pulse 0.5s ease;
+        }
+
+        @keyframes strike-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
         }
 
         .field {
-            flex: 1;
+            background: linear-gradient(135deg, #E0F6FF 0%, #98FB98 100%);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
             position: relative;
-            background: radial-gradient(ellipse at center bottom, #90EE90 0%, #228B22 100%);
+            height: 250px;
+            border: 4px solid #4682B4;
             overflow: hidden;
         }
 
-        .pitcher-mound {
+        .pitcher {
             position: absolute;
-            bottom: 40%;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 20px;
-            background: #8B4513;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em;
-            z-index: 10;
+            font-size: 2.5em;
+            animation: pitcher-dance 2s infinite;
         }
 
-        .batter-box {
+        @keyframes pitcher-dance {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            25% { transform: translateX(-50%) rotate(-5deg) scale(1.1); }
+            75% { transform: translateX(-50%) rotate(5deg) scale(0.9); }
+        }
+
+        .batter-area {
             position: absolute;
-            bottom: 10%;
-            right: 45%;
-            width: 100px;
-            height: 100px;
-            border: 3px solid white;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            border: 3px dashed #FF69B4;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
         }
 
         .batter {
-            font-size: 3em;
-            transition: transform 0.3s ease;
-            position: relative;
+            font-size: 2em;
+            transition: all 0.3s ease;
         }
 
         .batter.swinging {
-            transform: rotate(45deg);
+            transform: rotate(45deg) scale(1.2);
+            animation: swing-effect 0.5s ease;
         }
 
-        .bat-display {
-            position: absolute;
-            bottom: 15%;
-            right: 20%;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            min-width: 200px;
-            border: 2px solid #FFD700;
-        }
-
-        .current-bat {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #FFD700;
-        }
-
-        .bat-effect {
-            font-size: 1em;
-            color: #87CEEB;
+        @keyframes swing-effect {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 10px #FFD700); }
         }
 
         .ball {
             position: absolute;
             width: 20px;
             height: 20px;
-            background: white;
+            background: radial-gradient(circle, white 0%, #FF6B6B 100%);
             border-radius: 50%;
-            border: 2px solid #FF0000;
-            z-index: 15;
-            transition: all 0.1s linear;
+            border: 2px solid #333;
+            z-index: 10;
+            transition: all 0.1s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .hit-ball {
-            background: #FFD700;
-            box-shadow: 0 0 20px #FFD700;
+        .ball.crazy {
+            animation: crazy-spin 0.5s infinite;
         }
 
-        .controls {
+        @keyframes crazy-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hit-zone {
             position: absolute;
             bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            border: 3px solid #32CD32;
             border-radius: 15px;
-            z-index: 100;
+            background: rgba(50, 205, 50, 0.1);
+            animation: hit-zone-pulse 1s infinite;
         }
 
-        .control-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            font-size: 1.1em;
+        @keyframes hit-zone-pulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .hit-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
             border: none;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin: 15px auto;
+            border: 4px solid #FF1493;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        .hit-button:hover, .hit-button:active {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+        }
+
+        .message {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            min-height: 25px;
             font-weight: bold;
+            color: #FF1493;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
-        .swing-btn {
-            background: linear-gradient(45deg, #FF6B6B, #FF5252);
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 12px 15px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            border: 3px solid;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #98FB98, #90EE90);
             color: white;
+            border-color: #32CD32;
         }
 
-        .swing-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-        }
-
-        .bat-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-        }
-
-        .bat-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        .start-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
         }
 
         .reset-btn {
-            background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+            background: linear-gradient(135deg, #FFB6C1, #FFA07A);
             color: white;
+            border-color: #FF6347;
         }
 
         .reset-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 99, 71, 0.3);
         }
 
-        .special-effect {
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #FF69B4;
+            display: none;
+            z-index: 100;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .hit-effect {
             position: absolute;
+            font-size: 2em;
+            animation: hit-effect-anim 1s ease-out;
             pointer-events: none;
             z-index: 20;
-            font-size: 2em;
-            animation: specialEffect 2s ease-out forwards;
         }
 
-        @keyframes specialEffect {
+        @keyframes hit-effect-anim {
             0% { 
                 transform: scale(0.5);
                 opacity: 0;
@@ -210,497 +307,445 @@
             }
         }
 
-        .homerun-effect {
+        .special-ball {
+            background: radial-gradient(circle, #FFD700 0%, #FF69B4 50%, #4169E1 100%);
+            animation: rainbow-ball 1s infinite;
+        }
+
+        @keyframes rainbow-ball {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .ad-banner {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 50;
-            animation: homerunFlash 1s ease-out;
-        }
-
-        @keyframes homerunFlash {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
-        .result-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border-radius: 20px;
-            border: 3px solid #FFD700;
-            text-align: center;
-            display: none;
-            z-index: 200;
-        }
-
-        .distance-meter {
-            position: absolute;
-            top: 20%;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            min-width: 150px;
-        }
-
-        .meter-bar {
-            width: 100%;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            position: relative;
-            margin: 10px 0;
-            border: 2px solid white;
-        }
-
-        .meter-fill {
-            position: absolute;
             bottom: 0;
-            width: 100%;
-            background: linear-gradient(0deg, #4CAF50 0%, #FFC107 50%, #FF5722 100%);
-            border-radius: 8px;
-            transition: height 0.5s ease;
-        }
-
-        .achievement {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 215, 0, 0.9);
-            color: black;
-            padding: 15px 30px;
-            border-radius: 15px;
-            font-size: 1.5em;
-            font-weight: bold;
-            animation: achievementPop 3s ease-out forwards;
-            z-index: 100;
-        }
-
-        @keyframes achievementPop {
-            0% { 
-                transform: translateX(-50%) scale(0);
-                opacity: 0;
-            }
-            20% { 
-                transform: translateX(-50%) scale(1.2);
-                opacity: 1;
-            }
-            80% { 
-                transform: translateX(-50%) scale(1);
-                opacity: 1;
-            }
-            100% { 
-                transform: translateX(-50%) scale(0);
-                opacity: 0;
-            }
-        }
-
-        .clouds {
-            position: absolute;
-            top: 0;
             left: 0;
-            width: 100%;
-            height: 50%;
-            overflow: hidden;
+            right: 0;
+            height: 60px;
+            background: transparent;
+            z-index: 1000;
         }
 
-        .cloud {
+        .difficulty-indicator {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            border: 2px solid #FFB6C1;
+        }
+
+        .trail {
             position: absolute;
-            color: white;
-            font-size: 3em;
-            opacity: 0.7;
-            animation: cloudMove 20s linear infinite;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 107, 107, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: trail-fade 0.5s ease-out forwards;
         }
 
-        @keyframes cloudMove {
-            0% { transform: translateX(-100px); }
-            100% { transform: translateX(calc(100vw + 100px)); }
+        @keyframes trail-fade {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            h1 {
+                font-size: 1.7em;
+            }
+            
+            .field {
+                height: 200px;
+            }
+            
+            .pitcher {
+                font-size: 2em;
+            }
+            
+            .hit-button {
+                width: 100px;
+                height: 100px;
+                font-size: 1.1em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <div class="scoreboard">
-            <div class="title">⚾ 이상한 야구 ⚾</div>
-            <div class="stats">
-                <div>타수: <span id="at-bats">0</span></div>
-                <div>안타: <span id="hits">0</span></div>
-                <div>홈런: <span id="homeruns">0</span></div>
-                <div>총 거리: <span id="total-distance">0</span>m</div>
-                <div>타율: <span id="batting-average">0.000</span></div>
-            </div>
+        <h1>🤪 이상한 야구왕 ⚾</h1>
+        
+        <div class="game-info">
+            <div class="info-item">🏆 점수: <span id="score">0</span></div>
+            <div class="info-item">⚾ 타구: <span id="hits">0</span></div>
+            <div class="info-item">🚀 연속: <span id="combo">0</span></div>
         </div>
 
-        <div class="field">
-            <div class="clouds">
-                <div class="cloud" style="top: 10%; animation-delay: 0s;">☁️</div>
-                <div class="cloud" style="top: 5%; animation-delay: -5s;">☁️</div>
-                <div class="cloud" style="top: 15%; animation-delay: -10s;">☁️</div>
-            </div>
+        <div class="strikes-display">
+            <div class="strike" id="strike1">❌</div>
+            <div class="strike" id="strike2">❌</div>
+            <div class="strike" id="strike3">❌</div>
+        </div>
 
-            <div class="pitcher-mound">
-                🤖
-            </div>
+        <div class="difficulty-indicator">
+            🎯 난이도: <span id="difficulty">쉬움</span> | 속도: <span id="speed-level">1</span>
+        </div>
 
-            <div class="batter-box">
+        <div class="field" id="field">
+            <div class="pitcher">🤖</div>
+            <div class="hit-zone"></div>
+            <div class="batter-area">
                 <div class="batter" id="batter">🏏</div>
             </div>
-
-            <div class="bat-display">
-                <div class="current-bat">현재 배트:</div>
-                <div id="current-bat-name">일반 배트</div>
-                <div class="bat-effect" id="bat-effect">특수 효과 없음</div>
-            </div>
-
-            <div class="distance-meter">
-                <div>거리 측정기</div>
-                <div class="meter-bar">
-                    <div class="meter-fill" id="meter-fill"></div>
-                </div>
-                <div>최대: <span id="max-distance">0</span>m</div>
-            </div>
         </div>
 
-        <div class="controls">
-            <div style="color: #FFD700; margin-bottom: 10px; font-weight: bold;">조작</div>
-            <button class="control-btn swing-btn" onclick="swing()">스윙! (SPACE)</button>
-            <button class="control-btn bat-btn" onclick="changeBat()">배트 교체 (B)</button>
-            <button class="control-btn reset-btn" onclick="resetGame()">게임 리셋 (R)</button>
-        </div>
+        <button class="hit-button" id="hit-button" onclick="swing()">
+            🏏<br>스윙!
+        </button>
 
-        <div class="result-display" id="result-display">
-            <h2 id="result-title">결과</h2>
-            <p id="result-text">결과 텍스트</p>
-            <button class="control-btn swing-btn" onclick="closeResult()" style="margin-top: 20px;">계속하기</button>
+        <div class="message" id="message">🎮 게임을 시작해서 이상한 공을 쳐보세요!</div>
+
+        <div class="buttons">
+            <button class="btn start-btn" onclick="startGame()">🎮 게임 시작</button>
+            <button class="btn reset-btn" onclick="resetGame()">🔄 게임 리셋</button>
         </div>
     </div>
 
+    <div class="game-over" id="game-over">
+        <h2>🎉 게임 종료!</h2>
+        <p>🏆 최종 점수: <span id="final-score">0</span></p>
+        <p>⚾ 총 타구: <span id="final-hits">0</span></p>
+        <p>🚀 최고 연속: <span id="final-combo">0</span></p>
+        <p id="grade-message"></p>
+        <button class="btn start-btn" onclick="restartGame()" style="margin-top: 15px; width: 100%;">🔄 다시 시작</button>
+    </div>
+
+    <div class="ad-banner"></div>
+
     <script>
         let gameState = {
-            atBats: 0,
+            active: false,
+            score: 0,
             hits: 0,
-            homeruns: 0,
-            totalDistance: 0,
-            maxDistance: 0,
-            currentBatIndex: 0,
-            ballInPlay: false,
-            achievements: new Set()
+            strikes: 0,
+            combo: 0,
+            maxCombo: 0,
+            level: 1,
+            ballSpeed: 1,
+            ballCount: 0
         };
 
-        const bats = [
-            {
-                name: '일반 배트',
-                emoji: '🏏',
-                power: 1.0,
-                accuracy: 1.0,
-                effect: '특수 효과 없음',
-                special: null
-            },
-            {
-                name: '로켓 배트',
-                emoji: '🚀',
-                power: 2.5,
-                accuracy: 0.7,
-                effect: '초강력 파워! 낮은 정확도',
-                special: 'rocket'
-            },
-            {
-                name: '마법 지팡이',
-                emoji: '🪄',
-                power: 1.2,
-                accuracy: 1.5,
-                effect: '마법으로 공을 유도',
-                special: 'magic'
-            },
-            {
-                name: '햄머',
-                emoji: '🔨',
-                power: 3.0,
-                accuracy: 0.5,
-                effect: '엄청난 파워, 매우 낮은 정확도',
-                special: 'hammer'
-            },
-            {
-                name: '우산',
-                emoji: '☂️',
-                power: 0.8,
-                accuracy: 1.8,
-                effect: '바람을 이용해 멀리 날림',
-                special: 'wind'
-            },
-            {
-                name: '바나나',
-                emoji: '🍌',
-                power: 0.5,
-                accuracy: 0.3,
-                effect: '랜덤한 궤도로 날아감',
-                special: 'banana'
-            },
-            {
-                name: '검',
-                emoji: '⚔️',
-                power: 1.8,
-                accuracy: 1.3,
-                effect: '정확하고 날카로운 타격',
-                special: 'sword'
-            },
-            {
-                name: '물고기',
-                emoji: '🐟',
-                power: 0.3,
-                accuracy: 0.1,
-                effect: '왜 물고기로 치려고 하는가?',
-                special: 'fish'
-            },
-            {
-                name: '번개 배트',
-                emoji: '⚡',
-                power: 2.2,
-                accuracy: 1.1,
-                effect: '번개처럼 빠른 스윙',
-                special: 'lightning'
-            },
-            {
-                name: '무지개 배트',
-                emoji: '🌈',
-                power: 1.5,
-                accuracy: 1.0,
-                effect: '행운의 힘으로 멀티볼!',
-                special: 'rainbow'
-            }
+        let currentBall = null;
+        let ballTimer = null;
+        let ballAnimationId = null;
+
+        const crazyTrajectories = [
+            'zigzag',      // 지그재그
+            'circle',      // 원형
+            'sine',        // 사인파
+            'teleport',    // 순간이동
+            'reverse',     // 역방향
+            'spiral',      // 나선형
+            'bounce',      // 바운스
+            'drunk',       // 술취한듯 비틀거림
+            'lightning',   // 번개형
+            'infinity'     // 무한대 모양
         ];
 
-        function updateDisplay() {
-            document.getElementById('at-bats').textContent = gameState.atBats;
-            document.getElementById('hits').textContent = gameState.hits;
-            document.getElementById('homeruns').textContent = gameState.homeruns;
-            document.getElementById('total-distance').textContent = gameState.totalDistance;
-            document.getElementById('max-distance').textContent = gameState.maxDistance;
-            
-            const average = gameState.atBats > 0 ? (gameState.hits / gameState.atBats).toFixed(3) : '0.000';
-            document.getElementById('batting-average').textContent = average;
-            
-            const currentBat = bats[gameState.currentBatIndex];
-            document.getElementById('current-bat-name').textContent = currentBat.name + ' ' + currentBat.emoji;
-            document.getElementById('bat-effect').textContent = currentBat.effect;
-            document.getElementById('batter').textContent = currentBat.emoji;
-        }
+        function createBall() {
+            if (!gameState.active || currentBall) return;
 
-        function throwBall() {
             const ball = document.createElement('div');
             ball.className = 'ball';
+            
+            // 특별한 공 (10% 확률)
+            if (Math.random() < 0.1) {
+                ball.classList.add('special-ball');
+            }
+
+            // 더 어려워질수록 공이 더 미친듯이 움직임
+            if (gameState.level > 5) {
+                ball.classList.add('crazy');
+            }
+
+            // 시작 위치 (투수 마운드)
             ball.style.left = '50%';
-            ball.style.bottom = '40%';
-            document.querySelector('.field').appendChild(ball);
+            ball.style.top = '50px';
             
-            let position = { x: 50, y: 40 };
-            const targetX = 45;
-            const targetY = 10;
-            const speed = 2;
-            
-            const interval = setInterval(() => {
-                position.x += (targetX - position.x) * 0.1;
-                position.y += (targetY - position.y) * 0.1;
-                
-                ball.style.left = position.x + '%';
-                ball.style.bottom = position.y + '%';
-                
-                if (Math.abs(position.x - targetX) < 1 && Math.abs(position.y - targetY) < 1) {
-                    clearInterval(interval);
-                    if (!gameState.ballInPlay) {
-                        setTimeout(() => {
-                            if (ball.parentNode) {
-                                ball.parentNode.removeChild(ball);
-                            }
-                            showResult('스트라이크!', '공을 치지 못했습니다.');
-                            gameState.atBats++;
-                            updateDisplay();
-                        }, 500);
-                    }
+            document.getElementById('field').appendChild(ball);
+            currentBall = ball;
+
+            // 랜덤한 이상한 궤도 선택
+            const trajectory = crazyTrajectories[Math.floor(Math.random() * crazyTrajectories.length)];
+            animateBall(ball, trajectory);
+
+            // 공이 타격 구역에 도달하는 시간 체크
+            setTimeout(() => {
+                if (currentBall === ball) {
+                    missedBall();
                 }
-            }, 50);
+            }, 3000 / gameState.ballSpeed);
+        }
+
+        function animateBall(ball, trajectory) {
+            const field = document.getElementById('field');
+            const fieldWidth = field.offsetWidth;
+            const fieldHeight = field.offsetHeight;
             
-            return ball;
+            let startTime = Date.now();
+            let animationDuration = 3000 / gameState.ballSpeed; // 기본 3초, 속도에 따라 조정
+
+            function animate() {
+                if (!gameState.active || !ball.parentNode) return;
+
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / animationDuration;
+
+                if (progress >= 1) {
+                    if (currentBall === ball) {
+                        missedBall();
+                    }
+                    return;
+                }
+
+                const { x, y } = calculateCrazyPosition(progress, trajectory, fieldWidth, fieldHeight);
+                
+                ball.style.left = x + 'px';
+                ball.style.top = y + 'px';
+
+                // 공의 궤적 흔적 생성
+                if (Math.random() < 0.3) {
+                    createTrail(x, y);
+                }
+
+                ballAnimationId = requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        function calculateCrazyPosition(progress, trajectory, fieldWidth, fieldHeight) {
+            const startX = fieldWidth / 2;
+            const startY = 50;
+            const endX = fieldWidth - 100; // 타격 구역
+            const endY = fieldHeight - 100;
+
+            let x, y;
+
+            switch (trajectory) {
+                case 'zigzag':
+                    x = startX + (endX - startX) * progress;
+                    y = startY + (endY - startY) * progress + Math.sin(progress * 10) * 30;
+                    break;
+
+                case 'circle':
+                    const centerX = (startX + endX) / 2;
+                    const centerY = (startY + endY) / 2;
+                    const radius = 50;
+                    x = centerX + Math.cos(progress * Math.PI * 4) * radius + (endX - centerX) * progress;
+                    y = centerY + Math.sin(progress * Math.PI * 4) * radius + (endY - centerY) * progress;
+                    break;
+
+                case 'sine':
+                    x = startX + (endX - startX) * progress;
+                    y = startY + (endY - startY) * progress + Math.sin(progress * Math.PI * 6) * 40;
+                    break;
+
+                case 'teleport':
+                    if (progress < 0.3 || progress > 0.7) {
+                        x = startX + (endX - startX) * progress;
+                        y = startY + (endY - startY) * progress;
+                    } else {
+                        // 순간이동 효과
+                        x = Math.random() * fieldWidth;
+                        y = Math.random() * fieldHeight;
+                    }
+                    break;
+
+                case 'reverse':
+                    if (progress < 0.5) {
+                        x = startX + (endX - startX) * progress * 2;
+                        y = startY + (endY - startY) * progress * 2;
+                    } else {
+                        // 역방향으로 움직이다가 다시 원래 방향
+                        const reverseProgress = (progress - 0.5) * 2;
+                        x = endX - (endX - startX) * (1 - reverseProgress) * 0.3 + (endX - startX) * reverseProgress;
+                        y = endY - (endY - startY) * (1 - reverseProgress) * 0.3 + (endY - startY) * reverseProgress;
+                    }
+                    break;
+
+                case 'spiral':
+                    const spiralRadius = 60 * (1 - progress);
+                    x = startX + (endX - startX) * progress + Math.cos(progress * Math.PI * 8) * spiralRadius;
+                    y = startY + (endY - startY) * progress + Math.sin(progress * Math.PI * 8) * spiralRadius;
+                    break;
+
+                case 'bounce':
+                    x = startX + (endX - startX) * progress;
+                    const bounceHeight = Math.abs(Math.sin(progress * Math.PI * 5)) * 50;
+                    y = startY + (endY - startY) * progress - bounceHeight;
+                    break;
+
+                case 'drunk':
+                    x = startX + (endX - startX) * progress + Math.sin(progress * 15) * Math.random() * 25;
+                    y = startY + (endY - startY) * progress + Math.cos(progress * 12) * Math.random() * 25;
+                    break;
+
+                case 'lightning':
+                    const segments = Math.floor(progress * 10);
+                    x = startX + (endX - startX) * progress + (Math.random() - 0.5) * 40;
+                    y = startY + (endY - startY) * progress + (Math.random() - 0.5) * 40;
+                    break;
+
+                case 'infinity':
+                    const t = progress * Math.PI * 2;
+                    x = startX + (endX - startX) * progress + Math.sin(t) * 30;
+                    y = startY + (endY - startY) * progress + Math.sin(2 * t) * 20;
+                    break;
+
+                default:
+                    x = startX + (endX - startX) * progress;
+                    y = startY + (endY - startY) * progress;
+            }
+
+            return { x, y };
+        }
+
+        function createTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.className = 'trail';
+            trail.style.left = x + 'px';
+            trail.style.top = y + 'px';
+            document.getElementById('field').appendChild(trail);
+
+            setTimeout(() => {
+                if (trail.parentNode) {
+                    trail.parentNode.removeChild(trail);
+                }
+            }, 500);
         }
 
         function swing() {
-            if (gameState.ballInPlay) return;
-            
-            gameState.ballInPlay = true;
-            document.getElementById('batter').classList.add('swinging');
-            
-            const ball = throwBall();
-            
-            setTimeout(() => {
-                document.getElementById('batter').classList.remove('swinging');
-                
-                const currentBat = bats[gameState.currentBatIndex];
-                const hitChance = currentBat.accuracy * 0.8;
-                const isHit = Math.random() < hitChance;
-                
-                if (isHit) {
-                    hitBall(ball, currentBat);
-                } else {
-                    showResult('헛스윙!', '공을 맞추지 못했습니다.');
-                    gameState.atBats++;
-                }
-                
-                gameState.ballInPlay = false;
-                updateDisplay();
-            }, 300);
-        }
+            if (!gameState.active || !currentBall) return;
 
-        function hitBall(ball, bat) {
-            ball.classList.add('hit-ball');
-            gameState.atBats++;
-            gameState.hits++;
-            
-            const basePower = bat.power;
-            const randomFactor = 0.5 + Math.random();
-            const distance = Math.floor(basePower * randomFactor * 100);
-            
-            gameState.totalDistance += distance;
-            gameState.maxDistance = Math.max(gameState.maxDistance, distance);
-            
-            animateHitBall(ball, distance, bat);
-            applySpecialEffect(bat, distance);
-            
-            let resultTitle, resultText;
-            
-            if (distance >= 400) {
-                resultTitle = '🏆 홈런!';
-                resultText = `엄청난 ${distance}m 홈런입니다!`;
-                gameState.homeruns++;
-                createHomerunEffect();
-            } else if (distance >= 300) {
-                resultTitle = '🔥 장타!';
-                resultText = `훌륭한 ${distance}m 장타입니다!`;
-            } else if (distance >= 200) {
-                resultTitle = '👍 안타!';
-                resultText = `좋은 ${distance}m 안타입니다!`;
+            const batter = document.getElementById('batter');
+            batter.classList.add('swinging');
+
+            setTimeout(() => {
+                batter.classList.remove('swinging');
+            }, 500);
+
+            // 공이 타격 구역에 있는지 확인
+            const ball = currentBall;
+            const ballRect = ball.getBoundingClientRect();
+            const hitZone = document.querySelector('.hit-zone').getBoundingClientRect();
+
+            const isInZone = (
+                ballRect.left < hitZone.right &&
+                ballRect.right > hitZone.left &&
+                ballRect.top < hitZone.bottom &&
+                ballRect.bottom > hitZone.top
+            );
+
+            if (isInZone) {
+                hitBall(ball);
             } else {
-                resultTitle = '⚾ 약한 타구';
-                resultText = `${distance}m 약한 타구입니다.`;
-            }
-            
-            updateDistanceMeter(distance);
-            checkAchievements(distance);
-            showResult(resultTitle, resultText);
-        }
-
-        function animateHitBall(ball, distance, bat) {
-            const maxDistance = 500;
-            const finalX = 20 + (distance / maxDistance) * 60;
-            const finalY = 80 + (distance / maxDistance) * 20;
-            
-            let currentX = 45;
-            let currentY = 10;
-            let frame = 0;
-            const totalFrames = 60;
-            
-            const animation = setInterval(() => {
-                frame++;
-                const progress = frame / totalFrames;
-                
-                currentX = 45 + (finalX - 45) * progress;
-                currentY = 10 + (finalY - 10) * progress * (1 - progress * 0.5);
-                
-                ball.style.left = currentX + '%';
-                ball.style.bottom = currentY + '%';
-                ball.style.transform = `scale(${1 - progress * 0.5})`;
-                
-                if (frame >= totalFrames) {
-                    clearInterval(animation);
-                    setTimeout(() => {
-                        if (ball.parentNode) {
-                            ball.parentNode.removeChild(ball);
-                        }
-                    }, 1000);
-                }
-            }, 50);
-        }
-
-        function applySpecialEffect(bat, distance) {
-            const field = document.querySelector('.field');
-            
-            switch (bat.special) {
-                case 'rocket':
-                    createSpecialEffect('🚀💨', '30%', '50%');
-                    break;
-                case 'magic':
-                    createSpecialEffect('✨🌟✨', '40%', '60%');
-                    setTimeout(() => createSpecialEffect('🔮', '50%', '70%'), 500);
-                    break;
-                case 'hammer':
-                    createSpecialEffect('💥🔨💥', '35%', '55%');
-                    break;
-                case 'wind':
-                    createSpecialEffect('🌪️💨', '45%', '65%');
-                    break;
-                case 'banana':
-                    createSpecialEffect('🍌😂', '25%', '45%');
-                    if (Math.random() < 0.3) {
-                        setTimeout(() => createSpecialEffect('🤪', '60%', '30%'), 1000);
-                    }
-                    break;
-                case 'sword':
-                    createSpecialEffect('⚔️💢', '40%', '50%');
-                    break;
-                case 'fish':
-                    createSpecialEffect('🐟💦', '35%', '45%');
-                    if (Math.random() < 0.5) {
-                        setTimeout(() => createSpecialEffect('😅', '50%', '60%'), 800);
-                    }
-                    break;
-                case 'lightning':
-                    createSpecialEffect('⚡⚡⚡', '45%', '55%');
-                    document.querySelector('.field').style.filter = 'brightness(1.5)';
-                    setTimeout(() => {
-                        document.querySelector('.field').style.filter = 'brightness(1)';
-                    }, 200);
-                    break;
-                case 'rainbow':
-                    createSpecialEffect('🌈', '40%', '60%');
-                    if (Math.random() < 0.4) {
-                        setTimeout(() => {
-                            createSpecialEffect('⭐', '30%', '70%');
-                            createSpecialEffect('⭐', '60%', '40%');
-                        }, 500);
-                    }
-                    break;
+                missedSwing();
             }
         }
 
-        function createSpecialEffect(emoji, left, bottom) {
-            const effect = document.createElement('div');
-            effect.className = 'special-effect';
-            effect.textContent = emoji;
-            effect.style.left = left;
-            effect.style.bottom = bottom;
-            document.querySelector('.field').appendChild(effect);
+        function hitBall(ball) {
+            gameState.hits++;
+            gameState.combo++;
+            gameState.maxCombo = Math.max(gameState.maxCombo, gameState.combo);
+
+            // 점수 계산
+            let baseScore = 10;
+            if (ball.classList.contains('special-ball')) {
+                baseScore = 50;
+            }
             
-            setTimeout(() => {
-                if (effect.parentNode) {
-                    effect.parentNode.removeChild(effect);
-                }
-            }, 2000);
+            const comboBonus = gameState.combo * 2;
+            const levelBonus = gameState.level * 5;
+            const totalScore = baseScore + comboBonus + levelBonus;
+            
+            gameState.score += totalScore;
+
+            // 히트 이펙트
+            createHitEffect('💥 HIT! +' + totalScore, ball.offsetLeft, ball.offsetTop);
+
+            // 공 제거
+            removeBall();
+
+            // 메시지 업데이트
+            if (gameState.combo > 5) {
+                document.getElementById('message').textContent = `🔥 ${gameState.combo} 연속 히트! 대단해요!`;
+            } else {
+                document.getElementById('message').textContent = `🎉 히트! +${totalScore}점!`;
+            }
+
+            updateDisplay();
+            scheduleNextBall();
+            increaseDifficulty();
         }
 
-        function createHomerunEffect() {
+        function missedSwing() {
+            gameState.strikes++;
+            gameState.combo = 0;
+
+            updateStrikes();
+            createHitEffect('😅 헛스윙!', 300, 150);
+
+            if (gameState.strikes >= 3) {
+                endGame();
+            } else {
+                document.getElementById('message').textContent = `❌ 헛스윙! ${3 - gameState.strikes}번 더 기회가 있어요!`;
+            }
+        }
+
+        function missedBall() {
+            if (!currentBall) return;
+
+            gameState.strikes++;
+            gameState.combo = 0;
+
+            updateStrikes();
+            createHitEffect('⚾ 놓쳤어요!', 250, 120);
+            removeBall();
+
+            if (gameState.strikes >= 3) {
+                endGame();
+            } else {
+                document.getElementById('message').textContent = `💨 공을 놓쳤어요! ${3 - gameState.strikes}번 더 기회가 있어요!`;
+                scheduleNextBall();
+            }
+        }
+
+        function removeBall() {
+            if (currentBall && currentBall.parentNode) {
+                currentBall.parentNode.removeChild(currentBall);
+            }
+            currentBall = null;
+            if (ballAnimationId) {
+                cancelAnimationFrame(ballAnimationId);
+                ballAnimationId = null;
+            }
+        }
+
+        function createHitEffect(text, x, y) {
             const effect = document.createElement('div');
-            effect.className = 'homerun-effect';
-            document.body.appendChild(effect);
-            
+            effect.className = 'hit-effect';
+            effect.textContent = text;
+            effect.style.left = x + 'px';
+            effect.style.top = y + 'px';
+            document.getElementById('field').appendChild(effect);
+
             setTimeout(() => {
                 if (effect.parentNode) {
                     effect.parentNode.removeChild(effect);
@@ -708,96 +753,146 @@
             }, 1000);
         }
 
-        function updateDistanceMeter(distance) {
-            const maxDistance = 500;
-            const percentage = Math.min((distance / maxDistance) * 100, 100);
-            document.getElementById('meter-fill').style.height = percentage + '%';
-        }
-
-        function checkAchievements(distance) {
-            if (distance >= 500 && !gameState.achievements.has('super_homer')) {
-                gameState.achievements.add('super_homer');
-                showAchievement('🏆 슈퍼 홈런! 500m 돌파!');
-            }
-            
-            if (gameState.homeruns >= 10 && !gameState.achievements.has('homer_king')) {
-                gameState.achievements.add('homer_king');
-                showAchievement('👑 홈런왕! 10홈런 달성!');
-            }
-            
-            if (gameState.hits >= 50 && !gameState.achievements.has('hit_master')) {
-                gameState.achievements.add('hit_master');
-                showAchievement('⚾ 안타 마스터! 50안타 달성!');
-            }
-        }
-
-        function showAchievement(text) {
-            const achievement = document.createElement('div');
-            achievement.className = 'achievement';
-            achievement.textContent = text;
-            document.body.appendChild(achievement);
-            
-            setTimeout(() => {
-                if (achievement.parentNode) {
-                    achievement.parentNode.removeChild(achievement);
+        function updateStrikes() {
+            for (let i = 1; i <= 3; i++) {
+                const strike = document.getElementById(`strike${i}`);
+                if (i <= gameState.strikes) {
+                    strike.classList.add('active');
+                } else {
+                    strike.classList.remove('active');
                 }
-            }, 3000);
+            }
         }
 
-        function showResult(title, text) {
-            document.getElementById('result-title').textContent = title;
-            document.getElementById('result-text').textContent = text;
-            document.getElementById('result-display').style.display = 'block';
+        function updateDisplay() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('hits').textContent = gameState.hits;
+            document.getElementById('combo').textContent = gameState.combo;
         }
 
-        function closeResult() {
-            document.getElementById('result-display').style.display = 'none';
-        }
-
-        function changeBat() {
-            gameState.currentBatIndex = (gameState.currentBatIndex + 1) % bats.length;
-            updateDisplay();
+        function increaseDifficulty() {
+            gameState.ballCount++;
             
-            const currentBat = bats[gameState.currentBatIndex];
-            showResult(`배트 교체! ${currentBat.emoji}`, `${currentBat.name}으로 교체했습니다.\n${currentBat.effect}`);
+            if (gameState.ballCount % 5 === 0) {
+                gameState.level++;
+                gameState.ballSpeed += 0.2;
+                
+                let difficultyText = '쉬움';
+                if (gameState.level >= 8) difficultyText = '지옥';
+                else if (gameState.level >= 6) difficultyText = '매우어려움';
+                else if (gameState.level >= 4) difficultyText = '어려움';
+                else if (gameState.level >= 2) difficultyText = '보통';
+                
+                document.getElementById('difficulty').textContent = difficultyText;
+                document.getElementById('speed-level').textContent = gameState.level;
+                
+                createHitEffect(`🚀 레벨 ${gameState.level}!`, 200, 100);
+            }
+        }
+
+        function scheduleNextBall() {
+            if (!gameState.active) return;
+
+            const delay = Math.max(1000 - gameState.level * 100, 300);
+            ballTimer = setTimeout(() => {
+                createBall();
+            }, delay);
+        }
+
+        function startGame() {
+            if (gameState.active) return;
+
+            gameState = {
+                active: true,
+                score: 0,
+                hits: 0,
+                strikes: 0,
+                combo: 0,
+                maxCombo: 0,
+                level: 1,
+                ballSpeed: 1,
+                ballCount: 0
+            };
+
+            updateDisplay();
+            updateStrikes();
+            document.getElementById('difficulty').textContent = '쉬움';
+            document.getElementById('speed-level').textContent = '1';
+            document.getElementById('message').textContent = '🎮 게임 시작! 이상한 공이 날아옵니다!';
+
+            scheduleNextBall();
         }
 
         function resetGame() {
-            gameState = {
-                atBats: 0,
-                hits: 0,
-                homeruns: 0,
-                totalDistance: 0,
-                maxDistance: 0,
-                currentBatIndex: 0,
-                ballInPlay: false,
-                achievements: new Set()
-            };
+            gameState.active = false;
             
-            document.getElementById('meter-fill').style.height = '0%';
+            if (ballTimer) clearTimeout(ballTimer);
+            if (ballAnimationId) cancelAnimationFrame(ballAnimationId);
+            
+            removeBall();
+
+            gameState = {
+                active: false,
+                score: 0,
+                hits: 0,
+                strikes: 0,
+                combo: 0,
+                maxCombo: 0,
+                level: 1,
+                ballSpeed: 1,
+                ballCount: 0
+            };
+
             updateDisplay();
-            showResult('🔄 게임 리셋!', '모든 기록이 초기화되었습니다.');
+            updateStrikes();
+            document.getElementById('difficulty').textContent = '쉬움';
+            document.getElementById('speed-level').textContent = '1';
+            document.getElementById('message').textContent = '🎮 게임을 시작해서 이상한 공을 쳐보세요!';
+        }
+
+        function getGradeMessage(score, hits) {
+            if (hits >= 50) return '🏆 야구 신! 완벽한 실력입니다!';
+            if (hits >= 30) return '⭐ 야구 마스터! 대단해요!';
+            if (hits >= 20) return '👍 잘했어요! 실력이 늘고 있어요!';
+            if (hits >= 10) return '😊 괜찮아요! 더 연습해봐요!';
+            return '😅 아직 연습이 필요해요! 다시 도전!';
+        }
+
+        function endGame() {
+            gameState.active = false;
+            
+            if (ballTimer) clearTimeout(ballTimer);
+            if (ballAnimationId) cancelAnimationFrame(ballAnimationId);
+            
+            removeBall();
+
+            const gradeMsg = getGradeMessage(gameState.score, gameState.hits);
+            
+            document.getElementById('final-score').textContent = gameState.score;
+            document.getElementById('final-hits').textContent = gameState.hits;
+            document.getElementById('final-combo').textContent = gameState.maxCombo;
+            document.getElementById('grade-message').textContent = gradeMsg;
+            document.getElementById('game-over').style.display = 'block';
+        }
+
+        function restartGame() {
+            document.getElementById('game-over').style.display = 'none';
+            resetGame();
+            startGame();
         }
 
         document.addEventListener('keydown', (event) => {
-            switch (event.key.toLowerCase()) {
-                case ' ':
-                    event.preventDefault();
-                    swing();
-                    break;
-                case 'b':
-                    changeBat();
-                    break;
-                case 'r':
-                    resetGame();
-                    break;
-                case 'escape':
-                    closeResult();
-                    break;
+            if (event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+                swing();
+            } else if (event.key === 'Escape') {
+                if (gameState.active) {
+                    endGame();
+                }
             }
         });
 
+        // 초기 화면 설정
         updateDisplay();
+        updateStrikes();
     </script>
-</body>
-</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>크레이지 낚시왕</title>
+    <title>🎣 크레이지 낚시왕 🐟</title>
     <style>
         * {
             margin: 0;
@@ -12,251 +12,374 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(180deg, #87CEEB 0%, #4682B4 50%, #191970 100%);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #4682B4 30%, #20B2AA 70%, #008B8B 100%);
             min-height: 100vh;
-            color: white;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            padding: 10px;
+            padding-bottom: 70px;
+            overflow-x: hidden;
             position: relative;
         }
 
-        .waves {
+        .clouds {
             position: absolute;
-            top: 40%;
-            left: 0;
+            top: 10%;
             width: 100%;
-            height: 60%;
-            background: linear-gradient(180deg, rgba(64,130,180,0.7) 0%, rgba(25,25,112,0.9) 100%);
-            animation: wave 3s ease-in-out infinite;
+            height: 20%;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        @keyframes wave {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: float-clouds 20s infinite linear;
+        }
+
+        @keyframes float-clouds {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(calc(100vw + 100px)); }
         }
 
         .game-container {
-            position: relative;
-            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
             padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
             text-align: center;
-            height: 100vh;
+            border: 3px solid rgba(255, 182, 193, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+            position: relative;
         }
 
         h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
-            color: #FFD700;
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #FF69B4;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
 
         .game-info {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .info-item {
+            background: linear-gradient(45deg, #FFE4E1, #F0E68C);
+            padding: 8px 12px;
             border-radius: 15px;
-            backdrop-filter: blur(10px);
+            border: 2px solid #FFB6C1;
+            color: #FF1493;
+        }
+
+        .timing-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 2px solid #FFB6C1;
+        }
+
+        .timing-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #32CD32 0%, #FFD700 50%, #FF6347 100%);
+            transition: width 0.1s linear;
+            border-radius: 10px;
         }
 
         .fishing-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(180deg, #E0F6FF 0%, #87CEEB 100%);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
             position: relative;
+            height: 300px;
+            border: 4px solid #4682B4;
+            overflow: hidden;
+        }
+
+        .fisherman {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 3em;
+            z-index: 15;
+            animation: fisherman-idle 3s ease-in-out infinite;
+        }
+
+        @keyframes fisherman-idle {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(1deg); }
         }
 
         .fishing-rod {
             position: absolute;
-            top: -50px;
-            right: 20%;
-            width: 200px;
-            height: 300px;
-            background: linear-gradient(45deg, #8B4513 0%, #A0522D 100%);
-            border-radius: 5px;
+            top: 10px;
+            left: 80px;
+            width: 100px;
+            height: 4px;
+            background: #8B4513;
+            border-radius: 2px;
             transform: rotate(45deg);
-            transform-origin: bottom left;
-            z-index: 5;
+            z-index: 14;
         }
 
         .fishing-line {
             position: absolute;
-            top: 20%;
-            left: 50%;
-            width: 3px;
-            height: 400px;
+            top: 60px;
+            left: 150px;
+            width: 2px;
+            height: 180px;
             background: #333;
-            animation: sway 2s ease-in-out infinite;
+            z-index: 13;
+            animation: line-sway 2s ease-in-out infinite;
         }
 
-        @keyframes sway {
-            0%, 100% { transform: translateX(0px) rotate(0deg); }
-            50% { transform: translateX(10px) rotate(2deg); }
+        @keyframes line-sway {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(5px); }
         }
 
-        .command-display {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .hook {
+            position: absolute;
+            bottom: 5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            border: 2px solid #333;
+            border-radius: 50% 0 50% 50%;
+            transform: rotate(45deg);
         }
 
-        .current-command {
-            font-size: 4em;
-            font-weight: bold;
-            color: #FFD700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin-bottom: 15px;
-            letter-spacing: 10px;
-        }
-
-        .command-instruction {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-        }
-
-        .timer-bar {
+        .water-surface {
+            position: absolute;
+            top: 120px;
+            left: 0;
             width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 20px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.6);
+            animation: water-ripple 2s ease-in-out infinite;
         }
 
-        .timer-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50 0%, #FFC107 50%, #F44336 100%);
-            transition: width 0.1s linear;
+        @keyframes water-ripple {
+            0%, 100% { opacity: 0.6; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.5); }
         }
 
-        .input-display {
+        .fish {
+            position: absolute;
             font-size: 2em;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 15px;
-            border-radius: 10px;
-            min-height: 60px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 12;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: swim 3s ease-in-out infinite;
+        }
+
+        @keyframes swim {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            33% { transform: translateX(10px) translateY(-5px); }
+            66% { transform: translateX(-5px) translateY(5px); }
+        }
+
+        .fish:hover {
+            transform: scale(1.2);
+            filter: brightness(1.2);
+        }
+
+        .catch-zone {
+            position: absolute;
+            bottom: 50px;
+            left: 130px;
+            width: 40px;
+            height: 40px;
+            border: 3px dashed #32CD32;
+            border-radius: 50%;
+            animation: catch-zone-pulse 1s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        .catch-zone.active {
+            opacity: 1;
+        }
+
+        @keyframes catch-zone-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .catch-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px auto;
+            border: 4px solid #FF1493;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        .catch-button:hover, .catch-button:active {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+        }
+
+        .catch-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 12px 15px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            border: 3px solid;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #98FB98, #90EE90);
+            color: white;
+            border-color: #32CD32;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #FFB6C1, #FFA07A);
+            color: white;
+            border-color: #FF6347;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 99, 71, 0.3);
+        }
+
+        .message {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            min-height: 25px;
+            font-weight: bold;
+            color: #FF1493;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .fish-caught {
             position: absolute;
             font-size: 3em;
-            animation: fishJump 2s ease-out;
+            animation: fish-jump 2s ease-out;
             pointer-events: none;
             z-index: 20;
         }
 
-        @keyframes fishJump {
+        @keyframes fish-jump {
             0% { 
-                transform: translateY(200px) scale(0.5);
+                transform: translateY(100px) scale(0.5);
                 opacity: 0;
             }
             50% { 
-                transform: translateY(-100px) scale(1.2);
+                transform: translateY(-50px) scale(1.2);
                 opacity: 1;
             }
             100% { 
-                transform: translateY(-200px) scale(1);
+                transform: translateY(-100px) scale(1);
                 opacity: 0;
             }
-        }
-
-        .buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .start-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-        }
-
-        .start-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-        }
-
-        .reset-btn {
-            background: linear-gradient(45deg, #f44336, #da190b);
-            color: white;
-        }
-
-        .reset-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
-        }
-
-        .game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid #FFD700;
-            display: none;
-            z-index: 100;
-        }
-
-        .fish-collection {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .fish-item {
-            font-size: 1.5em;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .combo-display {
             position: absolute;
-            top: 20%;
-            right: 10%;
-            font-size: 2em;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
             font-weight: bold;
-            color: #FF6B6B;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            z-index: 15;
+            color: #FF69B4;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 15px;
+            border: 2px solid #FFB6C1;
+            display: none;
         }
 
-        .speed-indicator {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 10px;
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #FF69B4;
+            display: none;
+            z-index: 100;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .fish-collection {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
             margin-bottom: 10px;
+            flex-wrap: wrap;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+
+        .fish-item {
+            font-size: 1.2em;
+            background: rgba(255, 182, 193, 0.3);
+            padding: 3px 6px;
+            border-radius: 8px;
+            border: 1px solid #FFB6C1;
         }
 
         .bubbles {
@@ -272,13 +395,13 @@
         .bubble {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.3);
             animation: bubble-rise 4s linear infinite;
         }
 
         @keyframes bubble-rise {
             0% {
-                transform: translateY(100vh) scale(0);
+                transform: translateY(300px) scale(0);
                 opacity: 0;
             }
             10% {
@@ -288,61 +411,101 @@
                 opacity: 1;
             }
             100% {
-                transform: translateY(-100px) scale(1);
+                transform: translateY(-50px) scale(1);
                 opacity: 0;
+            }
+        }
+
+        .ad-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            h1 {
+                font-size: 1.7em;
+            }
+            
+            .fishing-area {
+                height: 250px;
+            }
+            
+            .fisherman {
+                font-size: 2.5em;
+            }
+            
+            .catch-button {
+                width: 80px;
+                height: 80px;
+                font-size: 1em;
             }
         }
     </style>
 </head>
 <body>
-    <div class="waves"></div>
-    <div class="bubbles" id="bubbles"></div>
-    
+    <div class="clouds">
+        <div class="cloud" style="top: 10px; width: 80px; height: 40px; animation-delay: 0s;"></div>
+        <div class="cloud" style="top: 30px; width: 60px; height: 30px; animation-delay: 5s;"></div>
+        <div class="cloud" style="top: 50px; width: 100px; height: 50px; animation-delay: 10s;"></div>
+    </div>
+
     <div class="game-container">
-        <h1>🎣 크레이지 낚시왕 🐟</h1>
+        <h1>🎣 귀여운 낚시왕 🐟</h1>
         
         <div class="game-info">
-            <div>점수: <span id="score">0</span></div>
-            <div>잡은 물고기: <span id="fish-count">0</span>마리</div>
-            <div>콤보: <span id="combo">0</span></div>
-            <div>레벨: <span id="level">1</span></div>
+            <div class="info-item">🏆 점수: <span id="score">0</span></div>
+            <div class="info-item">🐟 물고기: <span id="fish-count">0</span></div>
+            <div class="info-item">🔥 콤보: <span id="combo">0</span></div>
+            <div class="info-item">📈 레벨: <span id="level">1</span></div>
         </div>
 
-        <div class="speed-indicator">
-            현재 속도: <span id="speed-level">보통</span> | 시간 제한: <span id="time-limit">3.0</span>초
+        <div class="timing-bar">
+            <div class="timing-fill" id="timing-fill" style="width: 100%;"></div>
         </div>
 
-        <div class="fishing-rod"></div>
-        <div class="fishing-line"></div>
-
-        <div class="fishing-area">
-            <div class="command-display">
-                <div class="current-command" id="current-command">시작하세요!</div>
-                <div class="command-instruction" id="command-instruction">아래 버튼을 눌러 게임을 시작하세요</div>
-                <div class="timer-bar">
-                    <div class="timer-fill" id="timer-fill"></div>
-                </div>
-                <div class="input-display" id="input-display">입력 대기중...</div>
+        <div class="fishing-area" id="fishing-area">
+            <div class="bubbles" id="bubbles"></div>
+            <div class="fisherman">🧑‍🎣</div>
+            <div class="fishing-rod"></div>
+            <div class="fishing-line">
+                <div class="hook"></div>
             </div>
+            <div class="water-surface"></div>
+            <div class="catch-zone" id="catch-zone"></div>
+            <div class="combo-display" id="combo-display">COMBO x<span id="combo-count">0</span>!</div>
         </div>
+
+        <button class="catch-button" id="catch-button" onclick="tryToCatch()" disabled>🎣<br>잡기!</button>
+
+        <div class="message" id="message">🎮 게임을 시작하여 낚시를 즐겨보세요!</div>
 
         <div class="fish-collection" id="fish-collection"></div>
 
         <div class="buttons">
-            <button class="btn start-btn" onclick="startGame()">게임 시작</button>
-            <button class="btn reset-btn" onclick="resetGame()">게임 리셋</button>
-        </div>
-
-        <div class="combo-display" id="combo-display" style="display: none;"></div>
-
-        <div class="game-over" id="game-over">
-            <h2>🎉 게임 종료!</h2>
-            <p>최종 점수: <span id="final-score">0</span></p>
-            <p>잡은 물고기: <span id="final-fish">0</span>마리</p>
-            <p>최고 콤보: <span id="final-combo">0</span></p>
-            <button class="btn start-btn" onclick="restartGame()" style="margin-top: 20px;">다시 시작</button>
+            <button class="btn start-btn" onclick="startGame()">🎮 게임 시작</button>
+            <button class="btn reset-btn" onclick="resetGame()">🔄 게임 리셋</button>
         </div>
     </div>
+
+    <div class="game-over" id="game-over">
+        <h2>🎉 게임 종료!</h2>
+        <p>🏆 최종 점수: <span id="final-score">0</span></p>
+        <p>🐟 잡은 물고기: <span id="final-fish">0</span>마리</p>
+        <p>🔥 최고 콤보: <span id="final-combo">0</span></p>
+        <button class="btn start-btn" onclick="restartGame()" style="margin-top: 15px; width: 100%;">🔄 다시 시작</button>
+    </div>
+
+    <div class="ad-banner"></div>
 
     <script>
         let gameActive = false;
@@ -351,37 +514,35 @@
         let combo = 0;
         let maxCombo = 0;
         let level = 1;
-        let currentCommand = '';
-        let currentInput = '';
-        let timeLimit = 3000;
-        let timeLeft = 0;
-        let timerInterval = null;
-        let commandTimer = null;
+        let currentFish = null;
+        let fishSpawnTimer = null;
+        let catchWindow = false;
+        let catchWindowTimer = null;
+        let timingTimer = null;
+        let timingProgress = 100;
 
-        const commands = [
-            'ASDF', 'QWER', 'ZXCV', 'HJKL', 'WASD', 'SPACE', 'ENTER', 'SHIFT',
-            'ABC', 'XYZ', '123', '456', 'UP', 'DOWN', 'LEFT', 'RIGHT'
-        ];
-
-        const fishTypes = ['🐟', '🐠', '🐡', '🦈', '🐙', '🦑', '🦐', '🦀', '🐳', '🐋'];
-
-        const speedLevels = [
-            { name: '느림', time: 4000 },
-            { name: '보통', time: 3000 },
-            { name: '빠름', time: 2000 },
-            { name: '매우빠름', time: 1500 },
-            { name: '초고속', time: 1000 }
+        const fishTypes = [
+            { emoji: '🐟', points: 10, rarity: 0.4 },
+            { emoji: '🐠', points: 15, rarity: 0.3 },
+            { emoji: '🐡', points: 20, rarity: 0.15 },
+            { emoji: '🦈', points: 50, rarity: 0.05 },
+            { emoji: '🐙', points: 30, rarity: 0.1 },
+            { emoji: '🦑', points: 25, rarity: 0.12 },
+            { emoji: '🦐', points: 8, rarity: 0.5 },
+            { emoji: '🦀', points: 12, rarity: 0.35 },
+            { emoji: '🐳', points: 100, rarity: 0.01 },
+            { emoji: '🐋', points: 80, rarity: 0.02 }
         ];
 
         function generateBubbles() {
             const bubblesContainer = document.getElementById('bubbles');
             
             setInterval(() => {
-                if (gameActive) {
+                if (gameActive && Math.random() < 0.3) {
                     const bubble = document.createElement('div');
                     bubble.className = 'bubble';
                     bubble.style.left = Math.random() * 100 + '%';
-                    bubble.style.width = bubble.style.height = (Math.random() * 20 + 10) + 'px';
+                    bubble.style.width = bubble.style.height = (Math.random() * 15 + 5) + 'px';
                     bubble.style.animationDelay = Math.random() * 2 + 's';
                     bubblesContainer.appendChild(bubble);
                     
@@ -391,130 +552,148 @@
                         }
                     }, 4000);
                 }
-            }, 500);
+            }, 1000);
         }
 
-        function generateRandomCommand() {
-            const baseCommands = commands[Math.floor(Math.random() * commands.length)];
-            const length = Math.min(3 + Math.floor(level / 3), 8);
-            let command = '';
+        function selectRandomFish() {
+            const random = Math.random();
+            let cumulativeRarity = 0;
             
-            for (let i = 0; i < length; i++) {
-                if (Math.random() < 0.7) {
-                    command += baseCommands[Math.floor(Math.random() * baseCommands.length)];
-                } else {
-                    command += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+            for (let fish of fishTypes) {
+                cumulativeRarity += fish.rarity;
+                if (random <= cumulativeRarity) {
+                    return fish;
                 }
             }
-            
-            return command;
+            return fishTypes[0];
         }
 
-        function startFishing() {
+        function spawnFish() {
             if (!gameActive) return;
             
-            currentCommand = generateRandomCommand();
-            currentInput = '';
+            removeFish();
             
-            document.getElementById('current-command').textContent = currentCommand;
-            document.getElementById('command-instruction').textContent = '위 명령어를 빠르게 입력하세요!';
-            document.getElementById('input-display').textContent = '';
+            const fishType = selectRandomFish();
+            const fishElement = document.createElement('div');
+            fishElement.className = 'fish';
+            fishElement.textContent = fishType.emoji;
+            fishElement.onclick = () => tryToCatch();
             
-            const speedLevel = Math.min(Math.floor(level / 5), speedLevels.length - 1);
-            timeLimit = speedLevels[speedLevel].time;
-            timeLeft = timeLimit;
+            const fishingArea = document.getElementById('fishing-area');
+            const maxX = fishingArea.offsetWidth - 60;
+            const maxY = fishingArea.offsetHeight - 180;
             
-            document.getElementById('speed-level').textContent = speedLevels[speedLevel].name;
-            document.getElementById('time-limit').textContent = (timeLimit / 1000).toFixed(1);
+            fishElement.style.left = (50 + Math.random() * maxX) + 'px';
+            fishElement.style.top = (150 + Math.random() * maxY) + 'px';
             
-            startTimer();
+            fishElement.fishData = fishType;
+            fishingArea.appendChild(fishElement);
+            currentFish = fishElement;
+            
+            const catchZone = document.getElementById('catch-zone');
+            catchZone.classList.add('active');
+            
+            document.getElementById('catch-button').disabled = false;
+            document.getElementById('message').textContent = `${fishType.emoji} 물고기 발견! 빠르게 잡으세요!`;
+            
+            catchWindow = true;
+            startCatchTimer();
+            
+            const fishDuration = Math.max(2000 - level * 100, 800);
+            catchWindowTimer = setTimeout(() => {
+                missedFish();
+            }, fishDuration);
         }
 
-        function startTimer() {
-            if (timerInterval) clearInterval(timerInterval);
+        function startCatchTimer() {
+            const duration = Math.max(2000 - level * 100, 800);
+            timingProgress = 100;
             
-            timerInterval = setInterval(() => {
-                timeLeft -= 50;
-                const percentage = (timeLeft / timeLimit) * 100;
-                document.getElementById('timer-fill').style.width = percentage + '%';
+            timingTimer = setInterval(() => {
+                timingProgress -= 2;
+                document.getElementById('timing-fill').style.width = timingProgress + '%';
                 
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    missedFish();
+                if (timingProgress <= 0) {
+                    clearInterval(timingTimer);
                 }
-            }, 50);
+            }, duration / 50);
         }
 
-        function handleInput(key) {
-            if (!gameActive || currentCommand === '') return;
+        function tryToCatch() {
+            if (!gameActive || !catchWindow || !currentFish) return;
             
-            if (key === 'Backspace') {
-                currentInput = currentInput.slice(0, -1);
-                document.getElementById('input-display').textContent = currentInput;
-                return;
-            }
+            clearTimeout(catchWindowTimer);
+            clearInterval(timingTimer);
             
-            if (key.length === 1) {
-                currentInput += key.toUpperCase();
-                document.getElementById('input-display').textContent = currentInput;
-                
-                if (currentInput.length === currentCommand.length) {
-                    if (currentInput === currentCommand) {
-                        caughtFish();
-                    } else {
-                        missedFish();
-                    }
-                }
-            }
-        }
-
-        function caughtFish() {
-            if (timerInterval) clearInterval(timerInterval);
-            
-            const timeBonus = Math.floor((timeLeft / timeLimit) * 100);
-            const baseScore = level * 10;
-            const comboBonus = combo * 5;
-            const totalScore = baseScore + timeBonus + comboBonus;
+            const fishData = currentFish.fishData;
+            const timeBonus = Math.floor((timingProgress / 100) * 50);
+            const baseScore = fishData.points;
+            const comboBonus = combo * 2;
+            const levelBonus = level * 5;
+            const totalScore = baseScore + timeBonus + comboBonus + levelBonus;
             
             score += totalScore;
             fishCount++;
             combo++;
             maxCombo = Math.max(maxCombo, combo);
             
+            showFishCaught(fishData);
             updateDisplay();
-            showFishCaught();
             showComboEffect();
             
-            if (fishCount % 10 === 0) {
+            if (fishCount % 15 === 0) {
                 level++;
                 showLevelUp();
             }
             
-            setTimeout(() => {
-                startFishing();
-            }, 1000);
+            removeFish();
+            scheduleNextFish();
+            
+            document.getElementById('message').textContent = `🎉 잡았다! +${totalScore}점! ${fishData.emoji}`;
         }
 
         function missedFish() {
-            if (timerInterval) clearInterval(timerInterval);
+            if (!gameActive) return;
+            
+            clearTimeout(catchWindowTimer);
+            clearInterval(timingTimer);
             
             combo = 0;
-            document.getElementById('command-instruction').textContent = '놓쳤습니다! 다시 시도하세요!';
-            document.getElementById('input-display').textContent = '실패!';
-            
-            updateDisplay();
             hideComboEffect();
+            removeFish();
+            scheduleNextFish();
             
-            setTimeout(() => {
-                startFishing();
-            }, 1500);
+            document.getElementById('message').textContent = '😅 놓쳤어요! 다음 기회를 노려보세요!';
         }
 
-        function showFishCaught() {
+        function removeFish() {
+            if (currentFish && currentFish.parentNode) {
+                currentFish.parentNode.removeChild(currentFish);
+            }
+            currentFish = null;
+            catchWindow = false;
+            
+            const catchZone = document.getElementById('catch-zone');
+            catchZone.classList.remove('active');
+            
+            document.getElementById('catch-button').disabled = true;
+            document.getElementById('timing-fill').style.width = '100%';
+        }
+
+        function scheduleNextFish() {
+            if (!gameActive) return;
+            
+            const spawnDelay = Math.max(3000 - level * 150, 1000) + Math.random() * 2000;
+            fishSpawnTimer = setTimeout(() => {
+                spawnFish();
+            }, spawnDelay);
+        }
+
+        function showFishCaught(fishData) {
             const fishElement = document.createElement('div');
             fishElement.className = 'fish-caught';
-            fishElement.textContent = fishTypes[Math.floor(Math.random() * fishTypes.length)];
-            fishElement.style.left = (30 + Math.random() * 40) + '%';
+            fishElement.textContent = fishData.emoji;
+            fishElement.style.left = '50%';
             fishElement.style.top = '60%';
             
             document.body.appendChild(fishElement);
@@ -528,14 +707,18 @@
             const fishCollection = document.getElementById('fish-collection');
             const fishItem = document.createElement('div');
             fishItem.className = 'fish-item';
-            fishItem.textContent = fishElement.textContent;
+            fishItem.textContent = fishData.emoji;
             fishCollection.appendChild(fishItem);
+            
+            if (fishCollection.children.length > 20) {
+                fishCollection.removeChild(fishCollection.firstChild);
+            }
         }
 
         function showComboEffect() {
             if (combo > 1) {
                 const comboDisplay = document.getElementById('combo-display');
-                comboDisplay.textContent = `${combo} COMBO!`;
+                document.getElementById('combo-count').textContent = combo;
                 comboDisplay.style.display = 'block';
                 comboDisplay.style.animation = 'none';
                 comboDisplay.offsetHeight;
@@ -553,13 +736,17 @@
             levelUpElement.style.top = '50%';
             levelUpElement.style.left = '50%';
             levelUpElement.style.transform = 'translate(-50%, -50%)';
-            levelUpElement.style.fontSize = '3em';
+            levelUpElement.style.fontSize = '2.5em';
             levelUpElement.style.fontWeight = 'bold';
-            levelUpElement.style.color = '#FFD700';
-            levelUpElement.style.textShadow = '3px 3px 6px rgba(0, 0, 0, 0.5)';
+            levelUpElement.style.color = '#FF69B4';
+            levelUpElement.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.3)';
             levelUpElement.style.zIndex = '1000';
             levelUpElement.style.animation = 'bounce 1s ease';
-            levelUpElement.textContent = `레벨 ${level}!`;
+            levelUpElement.style.background = 'rgba(255, 255, 255, 0.9)';
+            levelUpElement.style.padding = '20px';
+            levelUpElement.style.borderRadius = '20px';
+            levelUpElement.style.border = '3px solid #FFB6C1';
+            levelUpElement.textContent = `🎉 레벨 ${level}! 🎉`;
             
             document.body.appendChild(levelUpElement);
             
@@ -590,36 +777,40 @@
             document.getElementById('fish-collection').innerHTML = '';
             hideComboEffect();
             
-            setTimeout(() => {
-                startFishing();
-            }, 1000);
+            document.getElementById('message').textContent = '🎣 낚시 시작! 물고기를 기다리는 중...';
+            
+            scheduleNextFish();
         }
 
         function resetGame() {
             gameActive = false;
-            if (timerInterval) clearInterval(timerInterval);
-            if (commandTimer) clearTimeout(commandTimer);
+            
+            if (fishSpawnTimer) clearTimeout(fishSpawnTimer);
+            if (catchWindowTimer) clearTimeout(catchWindowTimer);
+            if (timingTimer) clearInterval(timingTimer);
+            
+            removeFish();
             
             score = 0;
             fishCount = 0;
             combo = 0;
             maxCombo = 0;
             level = 1;
-            currentCommand = '';
-            currentInput = '';
             
             updateDisplay();
             document.getElementById('fish-collection').innerHTML = '';
-            document.getElementById('current-command').textContent = '시작하세요!';
-            document.getElementById('command-instruction').textContent = '아래 버튼을 눌러 게임을 시작하세요';
-            document.getElementById('input-display').textContent = '입력 대기중...';
-            document.getElementById('timer-fill').style.width = '100%';
+            document.getElementById('message').textContent = '🎮 게임을 시작하여 낚시를 즐겨보세요!';
             hideComboEffect();
         }
 
         function endGame() {
             gameActive = false;
-            if (timerInterval) clearInterval(timerInterval);
+            
+            if (fishSpawnTimer) clearTimeout(fishSpawnTimer);
+            if (catchWindowTimer) clearTimeout(catchWindowTimer);
+            if (timingTimer) clearInterval(timingTimer);
+            
+            removeFish();
             
             document.getElementById('final-score').textContent = score;
             document.getElementById('final-fish').textContent = fishCount;
@@ -639,7 +830,10 @@
                 return;
             }
             
-            handleInput(event.key);
+            if (event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+                tryToCatch();
+            }
         });
 
         generateBubbles();

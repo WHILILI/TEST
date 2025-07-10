@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>미로 찾기 게임</title>
+    <title>🗺️ 신비한 미로 탐험 🔍</title>
     <style>
         * {
             margin: 0;
@@ -12,65 +12,95 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #FFE5F1 0%, #E5F3FF 50%, #F0FFF0 100%);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
+            flex-direction: column;
+            color: #333;
+            padding: 10px;
+            padding-bottom: 70px;
+            overflow-x: hidden;
         }
 
         .game-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 90vw;
-            max-height: 90vh;
+            border: 3px solid rgba(255, 182, 193, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #FF69B4;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
 
         .game-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .controls {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 1.1em;
-        }
-
-        .key-hint {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin: 0 5px;
-            display: inline-block;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1em;
             font-weight: bold;
         }
 
-        .maze-container {
-            background: rgba(255, 255, 255, 0.9);
+        .info-item {
+            background: linear-gradient(45deg, #FFE4E1, #F0E68C);
+            padding: 8px 12px;
             border-radius: 15px;
-            padding: 20px;
-            margin: 0 auto 20px;
-            overflow: auto;
-            max-height: 60vh;
+            border: 2px solid #FFB6C1;
+            color: #FF1493;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 12px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #333;
+            border: 2px solid #FFB6C1;
+        }
+
+        .key-hint {
+            background: linear-gradient(45deg, #FFE4E1, #F0E68C);
+            padding: 4px 8px;
+            border-radius: 8px;
+            margin: 0 3px;
+            display: inline-block;
+            font-weight: bold;
+            color: #FF1493;
+            border: 1px solid #FFB6C1;
+            font-size: 0.8em;
+        }
+
+        .maze-container {
+            background: linear-gradient(135deg, #FFF8DC, #F0F8FF);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            border: 4px solid #FFB6C1;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .maze {
@@ -78,20 +108,23 @@
             gap: 1px;
             margin: 0 auto;
             background: #333;
-            border: 3px solid #333;
+            border: 2px solid #333;
             border-radius: 10px;
-            padding: 5px;
+            padding: 3px;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .cell {
-            width: 25px;
-            height: 25px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            border-radius: 2px;
         }
 
         .wall {
@@ -106,19 +139,43 @@
             background: #e74c3c;
             border-radius: 50%;
             animation: pulse 1s infinite;
+            position: relative;
+            z-index: 10;
         }
 
         .start {
             background: #27ae60;
+            animation: startGlow 2s infinite alternate;
         }
 
         .end {
             background: #f39c12;
-            animation: glow 1s infinite alternate;
+            animation: endGlow 1s infinite alternate;
         }
 
         .visited {
             background: #bdc3c7;
+        }
+
+        .fog {
+            background: #34495e !important;
+            color: transparent !important;
+            position: relative;
+        }
+
+        .fog::after {
+            content: '🌫️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .recently-visited {
+            background: #d5dbdb !important;
+            animation: fadeVisited 2s ease-out;
         }
 
         @keyframes pulse {
@@ -127,188 +184,219 @@
             100% { transform: scale(1); }
         }
 
-        @keyframes glow {
+        @keyframes startGlow {
+            0% { box-shadow: 0 0 5px #27ae60; }
+            100% { box-shadow: 0 0 15px #27ae60; }
+        }
+
+        @keyframes endGlow {
             0% { box-shadow: 0 0 5px #f39c12; }
-            100% { box-shadow: 0 0 15px #f39c12, 0 0 25px #f39c12; }
+            100% { box-shadow: 0 0 15px #f39c12; }
+        }
+
+        @keyframes fadeVisited {
+            0% { background: #3498db !important; }
+            100% { background: #d5dbdb !important; }
         }
 
         .buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .btn {
-            padding: 12px 25px;
-            font-size: 1.1em;
+            padding: 12px 15px;
+            font-size: 1em;
+            font-weight: bold;
             border: none;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            border: 3px solid;
         }
 
         .start-btn {
-            background: #27ae60;
+            background: linear-gradient(135deg, #98FB98, #90EE90);
             color: white;
+            border-color: #32CD32;
         }
 
         .start-btn:hover {
-            background: #2ecc71;
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
         }
 
         .reset-btn {
-            background: #e74c3c;
+            background: linear-gradient(135deg, #FFB6C1, #FFA07A);
             color: white;
+            border-color: #FF6347;
         }
 
         .reset-btn:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 99, 71, 0.3);
         }
 
         .hint-btn {
-            background: #3498db;
+            background: linear-gradient(135deg, #87CEEB, #4169E1);
             color: white;
+            border-color: #1E90FF;
         }
 
         .hint-btn:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(30, 144, 255, 0.3);
         }
 
         .level-btn {
-            background: #9b59b6;
+            background: linear-gradient(135deg, #DDA0DD, #9370DB);
             color: white;
+            border-color: #8A2BE2;
         }
 
         .level-btn:hover {
-            background: #8e44ad;
-            transform: translateY(-2px);
-        }
-
-        .message {
-            font-size: 1.3em;
-            margin-top: 20px;
-            min-height: 30px;
-            font-weight: bold;
-        }
-
-        .success {
-            color: #2ecc71;
-            animation: bounce 0.5s ease;
-        }
-
-        .hint-path {
-            background: #e8f5e8 !important;
-            border: 2px solid #27ae60;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 8px;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
         }
 
         .mobile-controls {
-            display: none;
+            display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-top: 20px;
+            margin-bottom: 15px;
             max-width: 200px;
             margin-left: auto;
             margin-right: auto;
         }
 
         .mobile-btn {
-            padding: 15px;
-            font-size: 1.2em;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5em;
             border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
             color: white;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            border: 3px solid #FF1493;
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
         }
 
-        .mobile-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .mobile-btn:hover, .mobile-btn:active {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.5);
         }
 
-        @media (max-width: 768px) {
-            .mobile-controls {
-                display: grid;
-            }
-            
-            .cell {
-                width: 20px;
-                height: 20px;
-                font-size: 14px;
+        .message {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            min-height: 25px;
+            font-weight: bold;
+            color: #FF1493;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .success {
+            color: #32CD32;
+            animation: successBounce 0.5s ease;
+        }
+
+        @keyframes successBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .hint-path {
+            background: #98FB98 !important;
+            border: 2px solid #32CD32 !important;
+            animation: hintPulse 1s infinite;
+        }
+
+        @keyframes hintPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .ad-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .fog-info {
+            background: rgba(52, 73, 94, 0.1);
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #2c3e50;
+            border: 2px solid #95a5a6;
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 15px;
+                margin: 5px;
             }
             
             h1 {
-                font-size: 2em;
+                font-size: 1.7em;
+            }
+            
+            .cell {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+            }
+            
+            .mobile-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3em;
+            }
+            
+            .game-info {
+                font-size: 0.9em;
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>🗺️ 미로 찾기 게임 🗺️</h1>
+        <h1>🗺️ 신비한 미로 탐험 🔍</h1>
         
-        <div class="stats">
-            <div class="stat-item">
-                <div>레벨: <span id="level">1</span></div>
-            </div>
-            <div class="stat-item">
-                <div>이동 수: <span id="moves">0</span></div>
-            </div>
-            <div class="stat-item">
-                <div>시간: <span id="time">00:00</span></div>
-            </div>
-            <div class="stat-item">
-                <div>힌트: <span id="hints">3</span>개</div>
-            </div>
+        <div class="game-info">
+            <div class="info-item">🏅 레벨: <span id="level">1</span></div>
+            <div class="info-item">👣 이동: <span id="moves">0</span></div>
+            <div class="info-item">⏰ 시간: <span id="time">00:00</span></div>
+            <div class="info-item">💡 힌트: <span id="hints">3</span></div>
+        </div>
+
+        <div class="fog-info">
+            🌫️ 주변 2칸만 보입니다! 탐험하며 길을 찾아보세요!
         </div>
 
         <div class="controls">
-            이동 조작: 
-            <span class="key-hint">↑</span>
-            <span class="key-hint">↓</span>
-            <span class="key-hint">←</span>
-            <span class="key-hint">→</span>
+            🎮 이동: 
+            <span class="key-hint">↑↓←→</span>
             또는
-            <span class="key-hint">W</span>
-            <span class="key-hint">A</span>
-            <span class="key-hint">S</span>
-            <span class="key-hint">D</span>
+            <span class="key-hint">WASD</span>
         </div>
 
         <div class="maze-container">
             <div class="maze" id="maze"></div>
-        </div>
-
-        <div class="buttons">
-            <button class="btn start-btn" onclick="startGame()">새 게임</button>
-            <button class="btn reset-btn" onclick="resetPosition()">위치 초기화</button>
-            <button class="btn hint-btn" onclick="showHint()">힌트 보기</button>
-            <button class="btn level-btn" onclick="nextLevel()">다음 레벨</button>
         </div>
 
         <div class="mobile-controls">
@@ -320,8 +408,17 @@
             <button class="mobile-btn" onclick="movePlayer('right')">→</button>
         </div>
 
-        <div class="message" id="message">🚩 시작 지점에서 🏆 골 지점까지 이동하세요!</div>
+        <div class="message" id="message">🚩 시작! 🏆 골을 찾아 탐험하세요!</div>
+
+        <div class="buttons">
+            <button class="btn start-btn" onclick="startGame()">🎮 새 게임</button>
+            <button class="btn reset-btn" onclick="resetPosition()">🔄 위치 초기화</button>
+            <button class="btn hint-btn" onclick="showHint()">💡 힌트 보기</button>
+            <button class="btn level-btn" onclick="nextLevel()">🚀 다음 레벨</button>
+        </div>
     </div>
+
+    <div class="ad-banner"></div>
 
     <script>
         let maze = [];
@@ -336,6 +433,8 @@
         let hints = 3;
         let mazeSize = 15;
         let visitedCells = new Set();
+        let exploredCells = new Set();
+        let visibilityRange = 2;
 
         function generateMaze(width, height) {
             maze = Array(height).fill().map(() => Array(width).fill(1));
@@ -398,6 +497,22 @@
             playerPos = { ...startPos };
         }
 
+        function isVisible(x, y) {
+            const dx = Math.abs(x - playerPos.x);
+            const dy = Math.abs(y - playerPos.y);
+            return dx <= visibilityRange && dy <= visibilityRange;
+        }
+
+        function updateExploredCells() {
+            for (let y = playerPos.y - visibilityRange; y <= playerPos.y + visibilityRange; y++) {
+                for (let x = playerPos.x - visibilityRange; x <= playerPos.x + visibilityRange; x++) {
+                    if (x >= 0 && x < maze[0].length && y >= 0 && y < maze.length) {
+                        exploredCells.add(`${x},${y}`);
+                    }
+                }
+            }
+        }
+
         function renderMaze() {
             const mazeElement = document.getElementById('maze');
             mazeElement.innerHTML = '';
@@ -408,22 +523,34 @@
                     const cell = document.createElement('div');
                     cell.className = 'cell';
                     
-                    if (maze[y][x] === 1) {
-                        cell.classList.add('wall');
+                    const isCurrentlyVisible = isVisible(x, y);
+                    const hasBeenExplored = exploredCells.has(`${x},${y}`);
+                    
+                    if (!hasBeenExplored && !isCurrentlyVisible) {
+                        cell.classList.add('fog');
                     } else {
-                        cell.classList.add('path');
+                        if (maze[y][x] === 1) {
+                            cell.classList.add('wall');
+                        } else {
+                            cell.classList.add('path');
+                            
+                            if (x === playerPos.x && y === playerPos.y) {
+                                cell.classList.add('player');
+                                cell.textContent = '😊';
+                            } else if (x === startPos.x && y === startPos.y && hasBeenExplored) {
+                                cell.classList.add('start');
+                                cell.textContent = '🚩';
+                            } else if (x === endPos.x && y === endPos.y && (hasBeenExplored || isCurrentlyVisible)) {
+                                cell.classList.add('end');
+                                cell.textContent = '🏆';
+                            } else if (visitedCells.has(`${x},${y}`)) {
+                                cell.classList.add('visited');
+                                cell.textContent = '👣';
+                            }
+                        }
                         
-                        if (x === playerPos.x && y === playerPos.y) {
-                            cell.classList.add('player');
-                            cell.textContent = '🔴';
-                        } else if (x === startPos.x && y === startPos.y) {
-                            cell.classList.add('start');
-                            cell.textContent = '🚩';
-                        } else if (x === endPos.x && y === endPos.y) {
-                            cell.classList.add('end');
-                            cell.textContent = '🏆';
-                        } else if (visitedCells.has(`${x},${y}`)) {
-                            cell.classList.add('visited');
+                        if (hasBeenExplored && !isCurrentlyVisible) {
+                            cell.style.opacity = '0.6';
                         }
                     }
                     
@@ -463,6 +590,8 @@
                 moves++;
                 document.getElementById('moves').textContent = moves;
                 
+                updateExploredCells();
+                
                 if (playerPos.x === endPos.x && playerPos.y === endPos.y) {
                     gameWon();
                 }
@@ -475,18 +604,26 @@
             gameStarted = false;
             clearInterval(gameTimer);
             
+            exploredCells.clear();
+            for (let y = 0; y < maze.length; y++) {
+                for (let x = 0; x < maze[0].length; x++) {
+                    exploredCells.add(`${x},${y}`);
+                }
+            }
+            renderMaze();
+            
             const timeElement = document.getElementById('time');
             const finalTime = timeElement.textContent;
             
             document.getElementById('message').innerHTML = 
-                `🎉 축하합니다! 레벨 ${level} 클리어! 시간: ${finalTime}, 이동 수: ${moves}`;
+                `🎉 축하합니다! 레벨 ${level} 클리어! ⏰${finalTime} 👣${moves}`;
             document.getElementById('message').className = 'message success';
             
             setTimeout(() => {
                 if (confirm(`레벨 ${level} 클리어!\n시간: ${finalTime}\n이동 수: ${moves}\n\n다음 레벨로 진행하시겠습니까?`)) {
                     nextLevel();
                 }
-            }, 1000);
+            }, 1500);
         }
 
         function startGame() {
@@ -499,14 +636,16 @@
             gameStarted = true;
             moves = 0;
             visitedCells.clear();
+            exploredCells.clear();
             
             mazeSize = Math.min(15 + level * 2, 25);
             generateMaze(mazeSize, mazeSize);
+            updateExploredCells();
             
             document.getElementById('level').textContent = level;
             document.getElementById('moves').textContent = moves;
             document.getElementById('hints').textContent = hints;
-            document.getElementById('message').textContent = '🚩 시작 지점에서 🏆 골 지점까지 이동하세요!';
+            document.getElementById('message').textContent = '🚩 시작! 🏆 골을 찾아 탐험하세요!';
             document.getElementById('message').className = 'message';
             
             startTime = Date.now();
@@ -532,12 +671,13 @@
             playerPos = { ...startPos };
             moves = 0;
             document.getElementById('moves').textContent = moves;
+            updateExploredCells();
             renderMaze();
         }
 
         function showHint() {
             if (hints <= 0 || !gameStarted) {
-                document.getElementById('message').textContent = '힌트가 없습니다!';
+                document.getElementById('message').textContent = '💡 힌트가 없습니다!';
                 return;
             }
             
@@ -547,6 +687,13 @@
             const path = findPath();
             if (path && path.length > 1) {
                 const nextStep = path[1];
+                
+                for (let i = 1; i < Math.min(path.length, 4); i++) {
+                    exploredCells.add(`${path[i].x},${path[i].y}`);
+                }
+                
+                renderMaze();
+                
                 const cells = document.querySelectorAll('.cell');
                 const cellIndex = nextStep.y * maze[0].length + nextStep.x;
                 if (cells[cellIndex]) {
@@ -556,7 +703,7 @@
                     }, 3000);
                 }
                 
-                document.getElementById('message').textContent = '💡 다음 이동할 곳이 표시되었습니다!';
+                document.getElementById('message').textContent = '💡 다음 이동할 곳과 길이 조금 보입니다!';
             }
         }
 
@@ -605,33 +752,36 @@
         }
 
         document.addEventListener('keydown', (event) => {
-            event.preventDefault();
-            
             switch (event.key) {
                 case 'ArrowUp':
                 case 'w':
                 case 'W':
+                    event.preventDefault();
                     movePlayer('up');
                     break;
                 case 'ArrowDown':
                 case 's':
                 case 'S':
+                    event.preventDefault();
                     movePlayer('down');
                     break;
                 case 'ArrowLeft':
                 case 'a':
                 case 'A':
+                    event.preventDefault();
                     movePlayer('left');
                     break;
                 case 'ArrowRight':
                 case 'd':
                 case 'D':
+                    event.preventDefault();
                     movePlayer('right');
                     break;
             }
         });
 
         generateMaze(mazeSize, mazeSize);
+        updateExploredCells();
         renderMaze();
     </script>
 </body>

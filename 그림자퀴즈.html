@@ -1,430 +1,669 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>그림자 퀴즈 - 무엇이든 돌려라</title>
-<style>
-    * {
-        margin: 0; padding: 0; box-sizing: border-box;
-    }
-    body {
-        font-family: 'Arial', sans-serif;
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        overflow: hidden;
-    }
-    .game-container {
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 30px;
-        max-width: 900px;
-        width: 95%;
-        text-align: center;
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-    h1 {
-        font-size: 2.5em;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    .game-info {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        font-size: 1.2em;
-    }
-    .game-area {
-        display: flex;
-        gap: 30px;
-        margin-bottom: 30px;
-        justify-content: center;
-    }
-    .shadow-container {
-        width: 250px;
-        height: 250px;
-        background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-    }
-    .shadow {
-        width: 150px;
-        height: 150px;
-        background: black;
-        position: relative;
-        transition: all 0.3s ease;
-        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        border-radius: 0;
-    }
-    .object-container {
-        width: 250px;
-        height: 250px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        border: 2px dashed rgba(255,255,255,0.3);
-    }
-    .object {
-        width: 120px;
-        height: 120px;
-        position: relative;
-        transition: transform 0.1s ease;
-        cursor: pointer;
-        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        border-radius: 0;
-        background: #96CEB4;
-    }
-    .rotation-controls {
-        margin-bottom: 20px;
-        font-size: 1.1em;
-    }
-    .key-hint {
-        background: rgba(255,255,255,0.2);
-        padding: 8px 12px;
-        border-radius: 8px;
-        margin: 0 10px;
-        display: inline-block;
-        font-weight: bold;
-    }
-    .options {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-        margin-bottom: 30px;
-        max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .option-btn {
-        padding: 15px 20px;
-        font-size: 1.1em;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: rgba(255,255,255,0.2);
-        color: white;
-        border: 2px solid transparent;
-    }
-    .option-btn:hover {
-        background: rgba(255,255,255,0.3);
-        transform: translateY(-2px);
-    }
-    .option-btn.correct {
-        background: #4CAF50;
-        border-color: #45a049;
-    }
-    .option-btn.incorrect {
-        background: #f44336;
-        border-color: #da190b;
-    }
-    .feedback {
-        font-size: 1.3em;
-        margin-bottom: 20px;
-        min-height: 30px;
-    }
-    .next-btn, .start-btn {
-        padding: 15px 30px;
-        font-size: 1.2em;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        background: #FF6B6B;
-        color: white;
-        transition: all 0.3s ease;
-        margin: 10px;
-        position: relative;
-        z-index: 10;
-    }
-    .next-btn:hover, .start-btn:hover {
-        background: #FF5252;
-        transform: translateY(-2px);
-    }
-    .game-over {
-        display: none;
-    }
-    .restart-btn {
-        padding: 15px 30px;
-        font-size: 1.2em;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        background: #4CAF50;
-        color: white;
-        transition: all 0.3s ease;
-        margin-top: 20px;
-    }
-    .restart-btn:hover {
-        background: #45a049;
-        transform: translateY(-2px);
-    }
-    .instructions {
-        background: rgba(255,255,255,0.1);
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        font-size: 1.1em;
-    }
-    .rotation-indicator {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: rgba(0,0,0,0.7);
-        color: white;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 0.9em;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌙 그림자 퀴즈 🔄</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #FFE5F1 0%, #E5F3FF 50%, #F0FFF0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            padding: 10px;
+            padding-bottom: 70px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            border: 3px solid rgba(255, 182, 193, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #FF69B4;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .info-item {
+            background: linear-gradient(45deg, #FFE4E1, #F0E68C);
+            padding: 8px 12px;
+            border-radius: 15px;
+            border: 2px solid #FFB6C1;
+            color: #FF1493;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 12px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            color: #333;
+            border: 2px solid #FFB6C1;
+        }
+
+        .rotation-controls {
+            margin-bottom: 15px;
+            font-size: 1em;
+            color: #FF69B4;
+            font-weight: bold;
+        }
+
+        .key-hint {
+            background: linear-gradient(45deg, #FFE4E1, #F0E68C);
+            padding: 6px 10px;
+            border-radius: 10px;
+            margin: 0 5px;
+            display: inline-block;
+            font-weight: bold;
+            color: #FF1493;
+            border: 2px solid #FFB6C1;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .shadow-container, .object-container {
+            width: 140px;
+            height: 140px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shadow-container {
+            background: radial-gradient(circle, #ffd60a 0%, #ffbe0b 100%);
+            box-shadow: 0 0 20px rgba(255, 214, 10, 0.3);
+        }
+
+        .object-container {
+            background: rgba(157, 78, 221, 0.1);
+            border: 2px dashed rgba(157, 78, 221, 0.4);
+        }
+
+        .shadow, .object {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .shadow {
+            background: #000;
+            filter: blur(1px);
+        }
+
+        .object {
+            cursor: pointer;
+            filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.5));
+        }
+
+        .rotation-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #e0aaff;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            border: 1px solid rgba(157, 78, 221, 0.5);
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            padding: 12px 10px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(157, 78, 221, 0.2);
+            color: #e0aaff;
+            border: 2px solid rgba(157, 78, 221, 0.3);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-btn:hover {
+            background: rgba(157, 78, 221, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+        }
+
+        .option-btn.correct {
+            background: rgba(46, 125, 50, 0.8);
+            border-color: #2e7d32;
+            color: #c8e6c9;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(211, 47, 47, 0.8);
+            border-color: #d32f2f;
+            color: #ffcdd2;
+        }
+
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            min-height: 30px;
+            color: #e0aaff;
+            text-shadow: 0 0 10px rgba(224, 170, 255, 0.5);
+        }
+
+        .start-btn, .next-btn {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #9d4edd, #c77dff);
+            color: white;
+            transition: all 0.3s ease;
+            margin: 8px;
+            border: 2px solid rgba(157, 78, 221, 0.5);
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+        }
+
+        .start-btn:hover, .next-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.5);
+        }
+
+        .game-over {
+            display: none;
+        }
+
+        .restart-btn {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #06ffa5, #3d5af1);
+            color: white;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            border: 2px solid rgba(6, 255, 165, 0.5);
+            box-shadow: 0 4px 15px rgba(6, 255, 165, 0.3);
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(6, 255, 165, 0.5);
+        }
+
+        .ad-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .touch-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .touch-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .touch-btn.left {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .touch-btn.right {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .touch-btn:hover, .touch-btn:active {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .shape-house {
+            background: #ff6b6b;
+            clip-path: polygon(50% 0%, 0% 40%, 0% 100%, 100% 100%, 100% 40%);
+        }
+
+        .shape-arrow {
+            background: #4ecdc4;
+            clip-path: polygon(0% 40%, 40% 40%, 40% 0%, 100% 50%, 40% 100%, 40% 60%, 0% 60%);
+        }
+
+        .shape-star {
+            background: #ffd93d;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .shape-heart {
+            background: #ff8a95;
+            clip-path: path('M12,21.35l-1.45-1.32C5.4,15.36,2,12.28,2,8.5 C2,5.42,4.42,3,7.5,3c1.74,0,3.41,0.81,4.5,2.09C13.09,3.81,14.76,3,16.5,3 C19.58,3,22,5.42,22,8.5c0,3.78-3.4,6.86-8.55,11.54L12,21.35z');
+            clip-path: polygon(50% 15%, 40% 5%, 25% 5%, 10% 20%, 10% 35%, 25% 50%, 50% 80%, 75% 50%, 90% 35%, 90% 20%, 75% 5%, 60% 5%);
+        }
+
+        .shape-lightning {
+            background: #9d4edd;
+            clip-path: polygon(30% 0%, 60% 0%, 40% 40%, 70% 40%, 40% 100%, 10% 60%, 30% 60%);
+        }
+
+        .shape-diamond {
+            background: #06ffa5;
+            clip-path: polygon(50% 0%, 80% 30%, 50% 100%, 20% 30%);
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            h1 {
+                font-size: 1.7em;
+            }
+            
+            .game-info {
+                font-size: 0.9em;
+                gap: 8px;
+            }
+            
+            .shadow-container, .object-container {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .shadow, .object {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .game-area {
+                gap: 10px;
+            }
+            
+            .touch-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="game-container">
-    <h1>🌑 그림자 퀴즈 - 무엇이든 돌려라 🔄</h1>
-
-    <div class="game-info">
-        <div>점수: <span id="score">0</span></div>
-        <div>문제: <span id="current-question">1</span> / 10</div>
-        <div>정답률: <span id="accuracy">0</span>%</div>
-    </div>
-
-    <div class="instructions">
-        그림자를 보고 물체를 회전시켜 같은 모양을 만든 후 정답을 선택하세요!
-    </div>
-
-    <div class="rotation-controls">
-        회전 조작: 
-        <span class="key-hint">A</span> 왼쪽 회전
-        <span class="key-hint">D</span> 오른쪽 회전
-    </div>
-
-    <div class="game-area">
-        <div class="shadow-container">
-            <div class="shadow" id="shadow"></div>
-            <div class="rotation-indicator">목표 그림자</div>
+    <div class="game-container">
+        <h1>🌙 신비한 그림자 퀴즈 🔄</h1>
+        
+        <div class="game-info">
+            <div class="info-item">🏆 점수: <span id="score">0</span></div>
+            <div class="info-item">📝 문제: <span id="current-question">1</span>/10</div>
+            <div class="info-item">🎯 정답률: <span id="accuracy">0</span>%</div>
         </div>
-        <div class="object-container">
-            <div class="object" id="object"></div>
-            <div class="rotation-indicator">회전: <span id="rotation-display">0°</span></div>
+
+        <div class="instructions">
+            🔍 그림자를 보고 물체를 회전시켜 같은 모양을 만든 후 정답을 선택하세요!
+        </div>
+
+        <div class="rotation-controls">
+            🔄 회전 조작: 
+            <span class="key-hint">A</span> 왼쪽
+            <span class="key-hint">D</span> 오른쪽
+        </div>
+
+        <div class="touch-controls">
+            <button class="touch-btn left" onclick="rotateObject(-1)">↺</button>
+            <button class="touch-btn right" onclick="rotateObject(1)">↻</button>
+        </div>
+
+        <div class="game-area">
+            <div class="shadow-container">
+                <div class="shadow" id="shadow"></div>
+                <div class="rotation-indicator">🎯 목표</div>
+            </div>
+            <div class="object-container">
+                <div class="object" id="object" onclick="rotateObject(1)"></div>
+                <div class="rotation-indicator">🔄 <span id="rotation-display">0°</span></div>
+            </div>
+        </div>
+
+        <div class="feedback" id="feedback">첫 번째 그림자를 맞춰보세요! ✨</div>
+
+        <div class="options" id="options">
+            <button class="option-btn" onclick="selectAnswer(0)">🏠 집</button>
+            <button class="option-btn" onclick="selectAnswer(1)">➡️ 화살표</button>
+            <button class="option-btn" onclick="selectAnswer(2)">⭐ 별</button>
+            <button class="option-btn" onclick="selectAnswer(3)">💖 하트</button>
+        </div>
+
+        <button class="start-btn" id="start-btn" onclick="startGame()">🎮 게임 시작</button>
+        <button class="next-btn" id="next-btn" style="display:none;" onclick="nextQuestion()">🚀 다음 문제</button>
+
+        <div class="game-over" id="game-over">
+            <h2>🎊 게임 완료! 🎊</h2>
+            <p>🏆 최종 점수: <span id="final-score">0</span> / 100</p>
+            <p>🎯 정답률: <span id="final-accuracy">0</span>%</p>
+            <p id="achievement-message"></p>
+            <button class="restart-btn" onclick="restartGame()">🔄 다시 도전하기</button>
         </div>
     </div>
 
-    <div class="feedback" id="feedback"></div>
+    <div class="ad-banner"></div>
 
-    <div class="options" id="options">
-        <button class="option-btn" onclick="selectAnswer(0)">삼각형</button>
-        <button class="option-btn" onclick="selectAnswer(1)">사각형</button>
-        <button class="option-btn" onclick="selectAnswer(2)">오각형</button>
-        <button class="option-btn" onclick="selectAnswer(3)">육각형</button>
-    </div>
+    <script>
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let totalQuestions = 10;
+        let questions = [];
+        let gameStarted = false;
+        let currentRotation = 0;
+        let targetRotation = 0;
 
-    <button class="start-btn" id="start-btn">게임 시작</button>
-    <button class="next-btn" id="next-btn" style="display:none;">다음 문제</button>
+        const objects = [
+            { 
+                name: '집', 
+                emoji: '🏠',
+                className: 'shape-house',
+                description: '지붕이 있는 집 모양'
+            },
+            { 
+                name: '화살표', 
+                emoji: '➡️',
+                className: 'shape-arrow',
+                description: '방향을 가리키는 화살표'
+            },
+            { 
+                name: '별', 
+                emoji: '⭐',
+                className: 'shape-star',
+                description: '다섯개 꼭짓점의 별'
+            },
+            { 
+                name: '하트', 
+                emoji: '💖',
+                className: 'shape-heart',
+                description: '사랑을 의미하는 하트'
+            },
+            { 
+                name: '번개', 
+                emoji: '⚡',
+                className: 'shape-lightning',
+                description: '지그재그 번개 모양'
+            },
+            { 
+                name: '다이아몬드', 
+                emoji: '💎',
+                className: 'shape-diamond',
+                description: '보석 다이아몬드 모양'
+            }
+        ];
 
-    <div class="game-over" id="game-over">
-        <h2>게임 종료!</h2>
-        <p>최종 점수: <span id="final-score">0</span> / 100</p>
-        <p>정답률: <span id="final-accuracy">0</span>%</p>
-        <button class="restart-btn" onclick="restartGame()">다시 시작</button>
-    </div>
-</div>
-
-<script>
-let currentQuestion = 0;
-let score = 0;
-let correctAnswers = 0;
-let totalQuestions = 10;
-let questions = [];
-let gameStarted = false;
-let currentRotation = 0;  // Z축만 사용
-let targetRotation = 0;
-
-const objects = [
-    { name: '삼각형', sides: 3, color: '#FF6B6B', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' },
-    { name: '사각형', sides: 4, color: '#4ECDC4', clipPath: 'none', borderRadius: '10px' },
-    { name: '오각형', sides: 5, color: '#FFD700', clipPath: 'polygon(50% 0%, 92% 35%, 75% 90%, 25% 90%, 8% 35%)' },
-    { name: '육각형', sides: 6, color: '#96CEB4', clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' }
-];
-
-function generateQuestions() {
-    questions = [];
-    for (let i = 0; i < totalQuestions; i++) {
-        const correctObject = objects[Math.floor(Math.random() * objects.length)];
-        const options = [correctObject.name];
-        while (options.length < 4) {
-            const randomObject = objects[Math.floor(Math.random() * objects.length)];
-            if (!options.includes(randomObject.name)) options.push(randomObject.name);
+        function generateQuestions() {
+            questions = [];
+            for (let i = 0; i < totalQuestions; i++) {
+                const correctObject = objects[Math.floor(Math.random() * objects.length)];
+                const options = [correctObject.name];
+                
+                while (options.length < 4) {
+                    const randomObject = objects[Math.floor(Math.random() * objects.length)];
+                    if (!options.includes(randomObject.name)) {
+                        options.push(randomObject.name);
+                    }
+                }
+                
+                for (let j = options.length - 1; j > 0; j--) {
+                    const k = Math.floor(Math.random() * (j + 1));
+                    [options[j], options[k]] = [options[k], options[j]];
+                }
+                
+                const targetRotation = Math.floor(Math.random() * 8) * 45;
+                
+                questions.push({
+                    object: correctObject,
+                    options: options,
+                    correctAnswer: options.indexOf(correctObject.name),
+                    targetRotation: targetRotation
+                });
+            }
         }
-        for (let j = options.length -1; j > 0; j--) {
-            const k = Math.floor(Math.random() * (j + 1));
-            [options[j], options[k]] = [options[k], options[j]];
+
+        function createShape(element, obj, rotation) {
+            element.className = `object ${obj.className}`;
+            element.style.transform = `rotate(${rotation}deg)`;
         }
-        targetRotation = Math.floor(Math.random() * 8) * 45;
-        questions.push({
-            object: correctObject,
-            options: options,
-            correctAnswer: options.indexOf(correctObject.name),
-            targetRotation: targetRotation
+
+        function createShadow(element, obj, rotation) {
+            element.className = `shadow ${obj.className}`;
+            element.style.transform = `rotate(${rotation}deg)`;
+        }
+
+        function displayQuestion() {
+            if (currentQuestion >= questions.length) {
+                endGame();
+                return;
+            }
+            
+            const question = questions[currentQuestion];
+            const shadowEl = document.getElementById('shadow');
+            const objectEl = document.getElementById('object');
+            
+            createShadow(shadowEl, question.object, question.targetRotation);
+            createShape(objectEl, question.object, currentRotation);
+            
+            const optionBtns = document.querySelectorAll('.option-btn');
+            optionBtns.forEach((btn, i) => {
+                const optionObject = objects.find(obj => obj.name === question.options[i]);
+                btn.innerHTML = `${optionObject.emoji} ${question.options[i]}`;
+                btn.className = 'option-btn';
+                btn.disabled = false;
+            });
+            
+            document.getElementById('current-question').textContent = currentQuestion + 1;
+            document.getElementById('feedback').textContent = `${question.object.emoji} 이 그림자의 정체를 밝혀보세요!`;
+            document.getElementById('next-btn').style.display = 'none';
+            updateRotationDisplay();
+        }
+
+        function updateRotationDisplay() {
+            document.getElementById('rotation-display').textContent = `${currentRotation}°`;
+        }
+
+        function rotateObject(direction) {
+            if (!gameStarted) return;
+            
+            currentRotation = (currentRotation + direction * 45) % 360;
+            if (currentRotation < 0) currentRotation += 360;
+            
+            const question = questions[currentQuestion];
+            const objectEl = document.getElementById('object');
+            createShape(objectEl, question.object, currentRotation);
+            updateRotationDisplay();
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (!gameStarted) return;
+            
+            const question = questions[currentQuestion];
+            const optionBtns = document.querySelectorAll('.option-btn');
+            
+            optionBtns.forEach(btn => btn.disabled = true);
+            
+            const rotationDiff = Math.abs(currentRotation - question.targetRotation);
+            const rotationMatch = rotationDiff <= 22.5 || rotationDiff >= 337.5;
+            
+            if (selectedIndex === question.correctAnswer && rotationMatch) {
+                score += 10;
+                correctAnswers++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('feedback').textContent = `완벽합니다! ✨ ${question.object.emoji} 정확한 회전! +10점`;
+                optionBtns[selectedIndex].classList.add('correct');
+            } else if (selectedIndex === question.correctAnswer) {
+                score += 5;
+                correctAnswers++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('feedback').textContent = `모양은 맞지만 회전각도가 아쉬워요! 🔄 +5점`;
+                optionBtns[selectedIndex].classList.add('correct');
+            } else {
+                document.getElementById('feedback').textContent = `틀렸습니다! 정답은 ${question.object.emoji} ${question.object.name}입니다 😅`;
+                optionBtns[selectedIndex].classList.add('incorrect');
+                optionBtns[question.correctAnswer].classList.add('correct');
+            }
+            
+            updateAccuracy();
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function updateAccuracy() {
+            const accuracy = Math.round((correctAnswers / (currentQuestion + 1)) * 100);
+            document.getElementById('accuracy').textContent = accuracy;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            currentRotation = 0;
+            displayQuestion();
+        }
+
+        function startGame() {
+            gameStarted = true;
+            currentQuestion = 0;
+            score = 0;
+            correctAnswers = 0;
+            currentRotation = 0;
+            
+            document.getElementById('start-btn').style.display = 'none';
+            generateQuestions();
+            displayQuestion();
+            document.getElementById('game-over').style.display = 'none';
+            document.querySelector('.game-area').style.display = 'flex';
+            document.getElementById('options').style.display = 'grid';
+            document.getElementById('feedback').textContent = '첫 번째 그림자를 맞춰보세요! ✨';
+        }
+
+        function getAchievementMessage(score, accuracy) {
+            if (score >= 90) return '🏆 그림자 마스터! 완벽한 실력입니다!';
+            if (score >= 70) return '⭐ 훌륭해요! 관찰력이 뛰어나시네요!';
+            if (score >= 50) return '👍 좋은 성과! 조금 더 연습해보세요!';
+            if (score >= 30) return '😊 괜찮아요! 그림자는 어려운 퀴즈예요!';
+            return '😅 다시 도전해보세요! 연습하면 늘어요!';
+        }
+
+        function endGame() {
+            gameStarted = false;
+            const finalAccuracy = Math.round((correctAnswers / totalQuestions) * 100);
+            const achievementMsg = getAchievementMessage(score, finalAccuracy);
+            
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-accuracy').textContent = finalAccuracy;
+            document.getElementById('achievement-message').textContent = achievementMsg;
+            document.getElementById('game-over').style.display = 'block';
+            document.querySelector('.game-area').style.display = 'none';
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function restartGame() {
+            gameStarted = false;
+            currentQuestion = 0;
+            score = 0;
+            correctAnswers = 0;
+            currentRotation = 0;
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('accuracy').textContent = 0;
+            document.getElementById('game-over').style.display = 'none';
+            document.querySelector('.game-area').style.display = 'flex';
+            document.getElementById('options').style.display = 'grid';
+            document.getElementById('start-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('feedback').textContent = '첫 번째 그림자를 맞춰보세요! ✨';
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (!gameStarted) return;
+            switch(event.key.toLowerCase()) {
+                case 'a': 
+                    event.preventDefault();
+                    rotateObject(-1); 
+                    break;
+                case 'd': 
+                    event.preventDefault();
+                    rotateObject(1); 
+                    break;
+            }
         });
-    }
-}
-
-function createShape(element, obj, rotation) {
-    element.style.background = obj.color;
-    element.style.borderRadius = obj.borderRadius || '0';
-    element.style.clipPath = obj.clipPath;
-    element.style.transform = `rotate(${rotation}deg)`;
-}
-
-function createShadow(element, obj, rotation) {
-    element.style.background = 'black';
-    element.style.borderRadius = obj.borderRadius || '0';
-    element.style.clipPath = obj.clipPath;
-    element.style.transform = `rotate(${rotation}deg)`;
-}
-
-function displayQuestion() {
-    if (currentQuestion >= questions.length) {
-        endGame();
-        return;
-    }
-    const question = questions[currentQuestion];
-    const shadowEl = document.getElementById('shadow');
-    const objectEl = document.getElementById('object');
-    createShadow(shadowEl, question.object, question.targetRotation);
-    createShape(objectEl, question.object, currentRotation);
-    const optionBtns = document.querySelectorAll('.option-btn');
-    optionBtns.forEach((btn, i) => {
-        btn.textContent = question.options[i];
-        btn.className = 'option-btn';
-        btn.disabled = false;
-    });
-    document.getElementById('current-question').textContent = currentQuestion + 1;
-    document.getElementById('feedback').textContent = '';
-    document.getElementById('next-btn').style.display = 'none';
-    updateRotationDisplay();
-}
-
-function updateRotationDisplay() {
-    document.getElementById('rotation-display').textContent = `${currentRotation}°`;
-}
-
-function rotateObject(direction) {
-    if (!gameStarted) return;
-    currentRotation = (currentRotation + direction * 45) % 360;
-    if (currentRotation < 0) currentRotation += 360;
-    const question = questions[currentQuestion];
-    const objectEl = document.getElementById('object');
-    createShape(objectEl, question.object, currentRotation);
-    updateRotationDisplay();
-}
-
-function selectAnswer(selectedIndex) {
-    if (!gameStarted) return;
-    const question = questions[currentQuestion];
-    const optionBtns = document.querySelectorAll('.option-btn');
-    optionBtns.forEach(btn => btn.disabled = true);
-    const rotationMatch = Math.abs(currentRotation - question.targetRotation) < 10 || Math.abs(currentRotation - question.targetRotation) > 350;
-    if (selectedIndex === question.correctAnswer && rotationMatch) {
-        score += 10;
-        correctAnswers++;
-        document.getElementById('score').textContent = score;
-        document.getElementById('feedback').textContent = '정답입니다! 완벽한 회전! 🎉';
-        optionBtns[selectedIndex].classList.add('correct');
-    } else if (selectedIndex === question.correctAnswer) {
-        score += 5;
-        correctAnswers++;
-        document.getElementById('score').textContent = score;
-        document.getElementById('feedback').textContent = '물체는 맞지만 회전이 아쉬워요! 🔄';
-        optionBtns[selectedIndex].classList.add('correct');
-    } else {
-        document.getElementById('feedback').textContent = `틀렸습니다. 정답은 ${question.object.name}입니다.`;
-        optionBtns[selectedIndex].classList.add('incorrect');
-        optionBtns[question.correctAnswer].classList.add('correct');
-    }
-    updateAccuracy();
-    document.getElementById('next-btn').style.display = 'inline-block';
-}
-
-function updateAccuracy() {
-    const accuracy = Math.round((correctAnswers / (currentQuestion + 1)) * 100);
-    document.getElementById('accuracy').textContent = accuracy;
-}
-
-function nextQuestion() {
-    currentQuestion++;
-    currentRotation = 0;
-    displayQuestion();
-}
-
-function startGame() {
-    gameStarted = true;
-    currentQuestion = 0;
-    score = 0;
-    correctAnswers = 0;
-    currentRotation = 0;
-    document.getElementById('start-btn').style.display = 'none';
-    generateQuestions();
-    displayQuestion();
-    document.getElementById('game-over').style.display = 'none';
-    document.querySelector('.game-area').style.display = 'flex';
-    document.getElementById('options').style.display = 'grid';
-    document.getElementById('feedback').textContent = '';
-}
-
-function endGame() {
-    gameStarted = false;
-    document.getElementById('final-score').textContent = score;
-    document.getElementById('final-accuracy').textContent = Math.round((correctAnswers / totalQuestions) * 100);
-    document.getElementById('game-over').style.display = 'block';
-    document.querySelector('.game-area').style.display = 'none';
-    document.getElementById('options').style.display = 'none';
-    document.getElementById('next-btn').style.display = 'none';
-}
-
-function restartGame() {
-    gameStarted = false;
-    currentQuestion = 0;
-    score = 0;
-    correctAnswers = 0;
-    currentRotation = 0;
-    document.getElementById('score').textContent = score;
-    document.getElementById('accuracy').textContent = 0;
-    document.getElementById('game-over').style.display = 'none';
-    document.querySelector('.game-area').style.display = 'flex';
-    document.getElementById('options').style.display = 'grid';
-    document.getElementById('start-btn').style.display = 'inline-block';
-    document.getElementById('next-btn').style.display = 'none';
-    document.getElementById('feedback').textContent = '';
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('next-btn').addEventListener('click', nextQuestion);
-});
-
-document.addEventListener('keydown', (event) => {
-    if (!gameStarted) return;
-    switch(event.key.toLowerCase()) {
-        case 'a': rotateObject(-1); break;
-        case 'd': rotateObject(1); break;
-    }
-});
-
-window.addEventListener('keydown', (e) => {
-    if(['a','d'].includes(e.key.toLowerCase())) e.preventDefault();
-});
-</script>
+    </script>
 </body>
 </html>
