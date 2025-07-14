@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T 운세</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .arcade-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 0, 150, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 255, 0, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .neon-title {
+            font-size: 3rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00ff88;
+            text-shadow: 
+                0 0 5px #00ff88,
+                0 0 10px #00ff88,
+                0 0 20px #00ff88,
+                0 0 40px #00ff88;
+            animation: neonFlicker 2s infinite alternate;
+        }
+        
+        @keyframes neonFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1rem;
+            color: #ff6b35;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .arcade-machine {
+            width: 350px;
+            height: 500px;
+            background: linear-gradient(145deg, #2d2d44, #1a1a2e);
+            border-radius: 20px 20px 40px 40px;
+            border: 4px solid #444;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 136, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .machine-top {
+            height: 60px;
+            background: linear-gradient(90deg, #ff6b35, #ff8e53);
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        
+        .screen-area {
+            height: 150px;
+            background: #000;
+            margin: 20px;
+            border-radius: 10px;
+            border: 3px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .crt-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 136, 0.1) 2px,
+                rgba(0, 255, 136, 0.1) 4px
+            );
+            pointer-events: none;
+        }
+        
+        .screen-content {
+            color: #00ff88;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 20px;
+            line-height: 1.4;
+            z-index: 1;
+        }
+        
+        .control-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .type-btn {
+            padding: 10px 20px;
+            border: none;
+            background: linear-gradient(145deg, #444, #222);
+            color: #fff;
+            border-radius: 10px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #666;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        .type-btn.active {
+            background: linear-gradient(145deg, #00ff88, #00cc6a);
+            color: #000;
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+        
+        .gacha-button-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .coin-slot {
+            width: 80px;
+            height: 20px;
+            background: #000;
+            border-radius: 10px;
+            border: 2px solid #333;
+            position: relative;
+        }
+        
+        .coin-slot::before {
+            content: "COIN";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #999;
+        }
+        
+        .gacha-btn {
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at 30% 30%, #ff6b35, #cc4125),
+                linear-gradient(45deg, #ff6b35, #ff8e53);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 
+                0 8px 0 #aa2e15,
+                0 15px 20px rgba(0,0,0,0.4),
+                inset 0 -3px 0 rgba(0,0,0,0.2),
+                inset 0 3px 0 rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        .gacha-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 10px 0 #aa2e15,
+                0 17px 22px rgba(0,0,0,0.4),
+                inset 0 -3px 0 rgba(0,0,0,0.2),
+                inset 0 3px 0 rgba(255,255,255,0.2);
+        }
+        
+        .gacha-btn:active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 4px 0 #aa2e15,
+                0 8px 15px rgba(0,0,0,0.4),
+                inset 0 -1px 0 rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        
+        .gacha-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .gacha-btn::before {
+            content: "PUSH";
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #999;
+            letter-spacing: 2px;
+        }
+        
+        .prize-slot {
+            width: 200px;
+            height: 60px;
+            background: #000;
+            border-radius: 10px;
+            border: 3px solid #333;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #666;
+            position: relative;
+        }
+        
+        .prize-slot::before {
+            content: "PRIZE OUTPUT";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            color: #999;
+            letter-spacing: 1px;
+        }
+        
+        .fortune-paper {
+            width: 180px;
+            height: 40px;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            color: #333;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.7rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            border: 1px solid #ccc;
+        }
+        
+        .fortune-paper.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .side-lights {
+            position: absolute;
+            top: 80px;
+            width: 10px;
+            height: 300px;
+        }
+        
+        .side-lights.left {
+            left: -15px;
+            background: linear-gradient(0deg, 
+                #ff0080 0%, #00ff80 25%, #0080ff 50%, #ff8000 75%, #ff0080 100%);
+        }
+        
+        .side-lights.right {
+            right: -15px;
+            background: linear-gradient(0deg, 
+                #ff8000 0%, #ff0080 25%, #00ff80 50%, #0080ff 75%, #ff8000 100%);
+        }
+        
+        .sound-effects {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sound-effects.show {
+            opacity: 1;
+            animation: soundBounce 0.5s ease-in-out;
+        }
+        
+        @keyframes soundBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes machineShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+        
+        .arcade-machine.shaking {
+            animation: machineShake 0.1s ease-in-out infinite;
+        }
+        
+        .fortune-details {
+            max-width: 350px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .fortune-details.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .fortune-level {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .level-positive {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .level-neutral {
+            background: #ffaa00;
+            color: #000;
+        }
+        
+        .level-warning {
+            background: #ff4444;
+            color: #fff;
+        }
+        
+        .fortune-text {
+            font-family: 'Arial', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #fff;
+        }
+        
+        @media (max-width: 480px) {
+            .arcade-machine {
+                width: 300px;
+                height: 450px;
+            }
+            
+            .neon-title {
+                font-size: 2.5rem;
+            }
+            
+            .gacha-btn {
+                width: 100px;
+                height: 100px;
+                font-size: 1rem;
+            }
+            
+            .type-btn {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="arcade-bg"></div>
+    
+    <h1 class="neon-title">T 운세</h1>
+    <p class="subtitle">Fortune Gacha Machine</p>
+    
+    <div class="arcade-machine" id="arcadeMachine">
+        <div class="side-lights left"></div>
+        <div class="side-lights right"></div>
+        
+        <div class="machine-top">
+            T FORTUNE GACHA
+        </div>
+        
+        <div class="screen-area">
+            <div class="crt-lines"></div>
+            <div class="screen-content" id="screenContent">
+                INSERT COIN<br>
+                SELECT TYPE<br>
+                PUSH BUTTON
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <div class="type-selector">
+                <button class="type-btn active" data-type="love">연애운</button>
+                <button class="type-btn" data-type="general">총운</button>
+            </div>
+            
+            <div class="gacha-button-area">
+                <div class="coin-slot"></div>
+                <button class="gacha-btn" id="gachaBtn">Start</button>
+            </div>
+        </div>
+        
+        <div class="prize-slot">
+            <div class="fortune-paper" id="fortunePaper">
+                운세를 뽑아보세요!
+            </div>
+        </div>
+    </div>
+    
+    <div class="fortune-details" id="fortuneDetails">
+        <div class="fortune-level" id="fortuneLevel">READY</div>
+        <div class="fortune-text" id="fortuneText">
+            뽑기 버튼을 눌러 운세를 확인하세요!
+        </div>
+    </div>
+    
+    <div class="sound-effects" id="soundEffects">🎵</div>
+    
+    <script>
+        const fortuneData = {
+            love: [
+                { content: "오늘은 당신의 매력이 유난히 빛나요. 누군가 반할지도 몰라요 ✨", level: "positive" },
+                { content: "마음을 열면 따뜻한 눈빛이 돌아옵니다 💌", level: "positive" },
+                { content: "기다렸던 연락이 올 가능성이 있어요 📱💕", level: "positive" },
+                { content: "작은 친절이 설렘으로 돌아올 수 있습니다 🌸", level: "positive" },
+                { content: "당신의 진심이 통하는 날이에요 💓", level: "positive" },
+                { content: "오늘의 미소는 인연을 부릅니다 😊💫", level: "positive" },
+                { content: "자연스러운 모습이 가장 매력적으로 느껴질 거예요 🍃", level: "positive" },
+                { content: "설레는 우연이 가까이 있어요 🎯", level: "positive" },
+                { content: "대화 속에서 특별한 감정을 발견할 수 있어요 💬💖", level: "positive" },
+                { content: "오늘은 고백하기 좋은 날이에요 🌹", level: "positive" },
+                { content: "함께 있는 시간이 유난히 소중하게 느껴질 거예요 ⏳❤️", level: "positive" },
+                { content: "상대방도 당신을 궁금해하고 있어요 ❓❣️", level: "positive" },
+                { content: "작은 선물이 큰 감동이 됩니다 🎁💗", level: "positive" },
+                { content: "닫힌 마음의 문이 천천히 열립니다 🚪💞", level: "positive" },
+                { content: "당신의 말 한마디가 누군가의 하루를 바꿔요 🗨️💓", level: "positive" },
+                { content: "오늘은 감정이 부드럽게 흐르는 날이에요 🌊💕", level: "positive" },
+                { content: "관심 있던 사람이 먼저 말을 걸 수 있어요 🙋‍♀️💘", level: "positive" },
+                { content: "당신을 향한 시선이 조금씩 더 따뜻해집니다 👀🌟", level: "positive" },
+                { content: "좋은 인연은 편안함 속에 피어납니다 ☕🌷", level: "positive" },
+                { content: "둘 사이에 작은 기적이 일어날지도 몰라요 ✨💞", level: "positive" },
+                { content: "사랑은 멀지 않은 곳에서 다가오고 있어요 🏃‍♂️💘", level: "positive" },
+                { content: "상대의 따뜻한 면을 발견하게 됩니다 🔍❤️", level: "positive" },
+                { content: "오늘은 다정한 말이 큰 용기를 줄 수 있어요 💬🌼", level: "positive" },
+                { content: "생각보다 빨리, 감정이 전해질 수 있어요 🚀💌", level: "positive" },
+                { content: "어색함을 넘어 설렘이 피어나는 날이에요 🌤️❤️", level: "positive" },
+                { content: "같은 방향을 바라보는 사람이 나타날 수 있어요 🧭💑", level: "positive" },
+                { content: "눈빛 하나에도 마음이 담겨 있어요 👁️❣️", level: "positive" },
+                { content: "상대도 당신을 기다리고 있었을 수 있어요 🕰️💕", level: "positive" },
+                { content: "가까운 사람에게서 의외의 설렘이 생깁니다 🙊💖", level: "positive" },
+                { content: "대화가 유난히 잘 통하는 날이에요 🗣️❤️", level: "positive" },
+                { content: "작은 오해가 풀리며 마음이 가까워집니다 🔓💞", level: "positive" },
+                { content: "당신의 용기가 인연을 부릅니다 💪💘", level: "positive" },
+                { content: "생각보다 더 깊은 감정을 품고 있는 사람이 있어요 🫣❤️", level: "positive" },
+                { content: "당신의 관심이 상대에게 큰 위로가 됩니다 💡💗", level: "positive" },
+                { content: "가까이 있는 사람이 연인이 될 수 있습니다 🌱💏", level: "positive" },
+                { content: "우연한 손길이 감정을 건드릴 수 있어요 🤝💓", level: "positive" },
+                { content: "상대방의 말보다 표정을 살펴보세요 🤔💭", level: "neutral" },
+                { content: "지나친 기대보다는 편안한 마음으로 바라보세요 🍃🫶", level: "neutral" },
+                { content: "먼저 다가가면 분위기가 훨씬 부드러워질 수 있어요 🚶‍♀️✨", level: "neutral" },
+                { content: "지나간 감정은 놓아주는 게 더 나은 선택일 수 있어요 🕊️💔", level: "neutral" },
+                { content: "말보다 침묵이 관계를 지켜주는 날도 있어요 🤐💬", level: "neutral" },
+                { content: "상대방의 속도를 존중해 주세요 🐢❤️", level: "neutral" },
+                { content: "연애는 타이밍보다도 공감이 중요할 때가 있어요 ⏰🤝", level: "neutral" },
+                { content: "상대의 말에 담긴 진심을 놓치지 마세요 🧠💞", level: "neutral" },
+                { content: "답답한 마음은 너무 오래 품지 말고 털어놓으세요 🫂💬", level: "neutral" },
+                { content: "상대도 당신만큼 조심스럽고 고민 중일 수 있어요 🤝💗", level: "neutral" },
+                { content: "오늘은 감정보다 행동으로 표현하는 게 좋아요 👟💕", level: "neutral" },
+                { content: "애매한 태도엔 확실한 기준이 필요합니다 📏💭", level: "neutral" },
+                { content: "마음이 흔들릴 땐 거리를 두고 다시 바라보세요 👣🧘‍♀️", level: "neutral" },
+                { content: "조급함이 오히려 감정을 멀어지게 할 수 있어요 🕓💧", level: "neutral" },
+                { content: "너무 많은 말보단 진심 한 마디가 중요해요 🗣️🎯", level: "neutral" },
+                { content: "감정이 격해질 땐 잠시 멈추는 것도 필요해요 🛑🧘", level: "neutral" },
+                { content: "연애는 경쟁이 아니라 함께 걷는 여정이에요 🚶‍♂️🚶‍♀️💕", level: "neutral" },
+                { content: "지금은 혼자 있는 시간이 더 필요한 순간일 수 있어요 🌙😌", level: "neutral" },
+                { content: "상대의 감정이 불안정할 수 있으니 조심스럽게 다가가세요 ⚠️🧡", level: "warning" },
+                { content: "오늘은 말실수로 관계에 금이 갈 수 있어요 💥😶", level: "warning" },
+                { content: "감정에 휘둘리면 오히려 본심을 잃을 수 있습니다 🎭💢", level: "warning" },
+                { content: "누군가의 거짓된 말에 속지 않도록 주의하세요 🚫💬", level: "warning" },
+                { content: "연애 감정인지 외로움인지 헷갈릴 수 있는 날입니다 🌫️💔", level: "warning" },
+                { content: "무리한 애정 표현은 부담을 줄 수 있어요 🎈😰", level: "warning" }
+            ],
+            general: [
+                { content: "괜찮아 딩딩딩딩딩", level: "positive", type: "밈" },
+                { content: "퉁퉁퉁퉁퉁퉁퉁퉁 사후르", level: "positive", type: "밈" },
+                { content: "너 누군데?", level: "positive", type: "밈" },
+                { content: "리얼 허거덩거덩스한 상황", level: "positive", type: "밈" },
+                { content: "햄부기햄북 햄북어 햄북스딱스", level: "positive", type: "밈" },
+                { content: "...완전 부럽다", level: "positive", type: "밈" },
+                { content: "..넘어갈게요", level: "positive", type: "밈" },
+                { content: "외모 췍~ Check!", level: "positive", type: "밈" },
+                { content: "완전 럭키비키 잖앙~", level: "positive", type: "밈" },
+                { content: "오늘 하루 망함", level: "positive", type: "밈" },
+                { content: "몸을 조금만 움직여도 활력이 도는 날이에요 🏃‍♂️", level: "positive", type: "건강" },
+                { content: "햇볕을 조금 쬐면 기분이 훨씬 나아질 수 있어요 ☀️", level: "positive", type: "건강" },
+                { content: "과로하지 마세요. 잠깐의 휴식이 오히려 효율을 높여요 ⏸️", level: "positive", type: "건강" },
+                { content: "쌓인 피로를 무시하지 마세요. 신호일 수 있습니다 🚨", level: "warning", type: "건강" },
+                { content: "오늘은 소화 기능이 예민해질 수 있어요. 자극적인 음식은 피하세요 🌶️", level: "warning", type: "건강" },
+                { content: "몸도 마음도 편안한 상태를 유지하세요. 건강은 흐름입니다 🌿", level: "positive", type: "건강" },
+                { content: "가벼운 운동이 스트레스를 줄여줄 수 있어요 🧘", level: "positive", type: "건강" },
+                { content: "오늘은 마음의 건강이 중요한 날입니다. 좋은 생각을 해보세요 🌈", level: "positive", type: "건강" },
+                { content: "오늘은 과식하지 않는 것이 포인트입니다 🍽️", level: "neutral", type: "건강" },
+                { content: "몸이 가벼운 만큼 기분도 좋아지는 날이에요 ☁️", level: "positive", type: "건강" },
+                { content: "컨디션이 다소 떨어질 수 있지만 큰 문제는 없어요 😌", level: "neutral", type: "건강" },
+                { content: "아플 때는 참지 말고 몸의 말을 들어주세요 ❤️", level: "neutral", type: "건강" },
+                { content: "지출을 줄이면 마음이 편해집니다 💸", level: "neutral", type: "금전" },
+                { content: "오늘은 계획적인 소비가 당신을 살립니다 📝", level: "positive", type: "금전" },
+                { content: "소소한 수입이 생길 수 있어요. 기대해도 좋아요 🎉", level: "positive", type: "금전" },
+                { content: "지갑을 열기 전, 한 번 더 생각해보세요 💼", level: "neutral", type: "금전" },
+                { content: "현금보다 카드 사용이 유리한 날입니다 💳", level: "positive", type: "금전" },
+                { content: "특별히 돈 걱정이 없는 하루가 될 수 있어요 😊", level: "positive", type: "금전" },
+                { content: "무계획한 지출은 나중에 발목을 잡을 수 있어요 ⚠️", level: "warning", type: "금전" },
+                { content: "뜻밖의 할인이나 혜택이 있을 수 있어요 🏷️", level: "positive", type: "금전" },
+                { content: "기회는 포착하는 사람에게 옵니다. 정보를 주의 깊게 살피세요 📊", level: "positive", type: "금전" },
+                { content: "오늘은 돈보다 사람을 신경쓰면 복이 옵니다 🙌", level: "positive", type: "금전" },
+                { content: "돌발 비용이 생길 수 있으니 여유 자금을 확보하세요 🧾", level: "warning", type: "금전" },
+                { content: "지출에 대한 후회는 오늘 하지 않게 될 거예요 🧘", level: "positive", type: "금전" },
+                { content: "작은 행운이 당신의 재정에 미소를 줄 수 있습니다 🍀", level: "positive", type: "금전" },
+                { content: "당신의 경제 감각이 빛나는 날이에요 ✨", level: "positive", type: "금전" },
+                { content: "기존의 소비 습관을 점검해보는 것도 좋습니다 🔍", level: "neutral", type: "금전" },
+                { content: "지인과의 금전 거래는 피하는 게 좋습니다 🙅", level: "warning", type: "금전" },
+                { content: "불필요한 구독 서비스, 지금 정리하면 좋습니다 🧹", level: "neutral", type: "금전" },
+                { content: "당신의 소비가 누군가에게 기쁨이 됩니다 🎁", level: "positive", type: "금전" },
+                { content: "가는 말이 고우면 오는 말도 곱습니다. 오늘의 대화에 힘을 주세요 🗣️", level: "positive", type: "속담" },
+                { content: "호랑이 굴에 가야 호랑이를 잡습니다. 도전이 필요한 하루입니다 🐅", level: "positive", type: "속담" },
+                { content: "낮말은 새가 듣고 밤말은 쥐가 듣습니다. 말조심이 필요해요 🐦🐭", level: "warning", type: "속담" },
+                { content: "고래 싸움에 새우 등 터지지 않게 거리를 두세요 🐋", level: "neutral", type: "속담" },
+                { content: "티끌 모아 태산, 오늘의 작은 노력이 내일을 바꿉니다 ⛰️", level: "positive", type: "속담" },
+                { content: "웃는 얼굴에 침 못 뱉는다. 웃음이 무기인 날입니다 😊", level: "positive", type: "속담" },
+                { content: "천 리 길도 한 걸음부터. 시작이 중요합니다 👣", level: "positive", type: "속담" },
+                { content: "말 한마디로 천냥 빚 갚는다. 당신의 말에 힘이 있어요 💬", level: "positive", type: "속담" },
+                { content: "가는 날이 장날일 수 있어요. 우연을 기회로 만드세요 🛍️", level: "positive", type: "속담" },
+                { content: "등잔 밑이 어둡습니다. 가까운 곳을 다시 살펴보세요 🕯️", level: "neutral", type: "속담" },
+                { content: "고생 끝에 낙이 온다. 오늘은 조금만 더 참아보세요 💪", level: "positive", type: "속담" },
+                { content: "우물 안 개구리 되지 않도록 시야를 넓혀보세요 🌍", level: "neutral", type: "속담" },
+                { content: "될성부른 나무는 떡잎부터 알아본다. 당신의 잠재력이 보이는 날입니다 🌱", level: "positive", type: "속담" },
+                { content: "불난 집에 부채질하지 마세요. 감정 조절이 필요합니다 🔥", level: "warning", type: "속담" },
+                { content: "서당 개 삼 년이면 풍월을 읊습니다. 실력이 쌓이고 있어요 📚", level: "positive", type: "속담" },
+                { content: "바늘 도둑이 소 도둑 된다. 작은 유혹도 경계하세요 🪡🐄", level: "warning", type: "속담" },
+                { content: "하늘은 스스로 돕는 자를 돕습니다. 주도적인 하루를 보내보세요 🌤️", level: "positive", type: "속담" },
+                { content: "구슬이 서 말이라도 꿰어야 보배. 마무리를 지으세요 📿", level: "neutral", type: "속담" },
+                { content: "등 돌린 사람이 다시 돌아올 수 있어요. 마음을 열어두세요 🔁", level: "positive", type: "속담" },
+                { content: "바람이 분다고 모두 날아가지 않습니다. 중심을 지키세요 🍃", level: "neutral", type: "속담" }
+            ]
+        };
+        
+        let selectedType = 'love';
+        let isGachaRunning = false;
+        
+        const typeButtons = document.querySelectorAll('.type-btn');
+        const gachaBtn = document.getElementById('gachaBtn');
+        const arcadeMachine = document.getElementById('arcadeMachine');
+        const screenContent = document.getElementById('screenContent');
+        const fortunePaper = document.getElementById('fortunePaper');
+        const fortuneDetails = document.getElementById('fortuneDetails');
+        const fortuneLevel = document.getElementById('fortuneLevel');
+        const fortuneText = document.getElementById('fortuneText');
+        const soundEffects = document.getElementById('soundEffects');
+        
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isGachaRunning) return;
+                
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedType = btn.dataset.type;
+                
+                screenContent.innerHTML = `${selectedType === 'love' ? '연애운' : '총운'} SELECTED<br>PUSH BUTTON<br>TO START`;
+                fortunePaper.classList.remove('show');
+                fortuneDetails.classList.remove('show');
+            });
+        });
+        
+        gachaBtn.addEventListener('click', () => {
+            if (isGachaRunning) return;
+            
+            isGachaRunning = true;
+            gachaBtn.disabled = true;
+            arcadeMachine.classList.add('shaking');
+            
+            screenContent.innerHTML = 'PROCESSING...<br>♪ ♫ ♪<br>PLEASE WAIT';
+            soundEffects.classList.add('show');
+            
+            setTimeout(() => {
+                arcadeMachine.classList.remove('shaking');
+                soundEffects.classList.remove('show');
+                
+                const fortunes = fortuneData[selectedType];
+                const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+                
+                fortunePaper.textContent = randomFortune.content.slice(0, 20) + '...';
+                fortunePaper.classList.add('show');
+                
+                const levelClass = randomFortune.level === 'positive' ? 'level-positive' : 
+                                 randomFortune.level === 'neutral' ? 'level-neutral' : 'level-warning';
+                fortuneLevel.className = `fortune-level ${levelClass}`;
+                
+                let levelText = randomFortune.level === 'positive' ? 'LUCKY' : 
+                               randomFortune.level === 'neutral' ? 'NORMAL' : 'CAUTION';
+                
+                if (randomFortune.type) {
+                    levelText += ` - ${randomFortune.type}`;
+                }
+                
+                fortuneLevel.textContent = levelText;
+                fortuneText.textContent = randomFortune.content;
+                
+                screenContent.innerHTML = 'FORTUNE READY!<br>CHECK BELOW<br>♥ ♦ ♣ ♠';
+                
+                setTimeout(() => {
+                    fortuneDetails.classList.add('show');
+                }, 300);
+                
+                setTimeout(() => {
+                    isGachaRunning = false;
+                    gachaBtn.disabled = false;
+                    screenContent.innerHTML = 'READY FOR<br>NEXT FORTUNE<br>PUSH AGAIN!';
+                }, 1000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
