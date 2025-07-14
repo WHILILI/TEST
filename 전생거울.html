@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전생거울 - 나의 전생은?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        .mirror {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid #e2e8f0;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .mirror:hover {
+            transform: scale(1.05);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .mirror-text {
+            font-size: 1.2rem;
+            color: #2d3748;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            display: none;
+            text-align: left;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .character-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .character-desc {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .character-number {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .try-again-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .try-again-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .mirror {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .mirror-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🪞 전생거울</h1>
+        <p class="subtitle">거울을 클릭해서 당신의 전생을 알아보세요!</p>
+        
+        <div class="mirror" onclick="revealPastLife()">
+            <div class="mirror-text">클릭하세요</div>
+        </div>
+        
+        <div class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #718096;">전생을 찾는 중...</p>
+        </div>
+        
+        <div class="result" id="result">
+            <div class="character-number" id="characterNumber"></div>
+            <div class="character-name" id="characterName"></div>
+            <div class="character-desc" id="characterDesc"></div>
+            <button class="try-again-btn" onclick="tryAgain()">다시 보기</button>
+        </div>
+    </div>
+
+    <script>
+        const pastLives = [
+            { name: "감자 지키는 파수꾼", desc: "감자밭 근처를 서성이는 자를 혼냈던 무직 백성" },
+            { name: "에도시대 고양이 간식 개발자", desc: "생선 안 들어간 간식 만들어 야유받았지만 대박남" },
+            { name: "술잔 수집광", desc: "술을 안 마시고 잔만 모아 파산한 귀족" },
+            { name: "왕실 머리끈 디자이너", desc: "색깔 하나로 궁중 분위기를 바꿨다" },
+            { name: "라멘 고명 수비대", desc: "달걀 도둑을 막기 위해 스프 속에서 매복" },
+            { name: "냉면 온도 지킴이", desc: "냉면이 따뜻해지면 국법 위반이라 주장함" },
+            { name: "금주법 시대 딸기청 밀매상", desc: "위스키 대신 달달한 딸기청으로 체포됨" },
+            { name: "워크맨 조립 알바생", desc: "테이프를 거꾸로 넣어 해고 위기" },
+            { name: "엽기요리 연구소 조수", desc: "고양이 혀찜을 제안했다가 쫓겨남" },
+            { name: "1970년대 냉장고 설명 방송인", desc: "냉장고 속에 살고 싶다며 사표냄" },
+            { name: "IMF 시절 종이컵 타로사", desc: "종이컵 바닥 무늬로 미래를 읽음" },
+            { name: "대공황 콩 통조림 시식단", desc: "콩 1개로 점심 때우던 시식 전문가" },
+            { name: "비디오 가게 안내견", desc: "눈빛으로 추천 영화를 전함" },
+            { name: "얼음 보관소 몰래 드나든 얼덕", desc: "여름에도 냉국 먹겠다는 일념" },
+            { name: "시절 연필깎이 감정사", desc: "연필 심 길이로 성격을 분석" },
+            { name: "건널목 멍 때리기 챔피언", desc: "하루 9시간을 빨간불 앞에서 보냄" },
+            { name: "포켓몬 세대 알까기 왕", desc: "모든 카드로 바꿔치기 당함" },
+            { name: "시식 전문러", desc: "주문은 안 하지만 시식 후 평가는 냉정" },
+            { name: "냉동피자 온도 최적화 연구원", desc: "15초 차이로 식감이 바뀐다는 신념 보유" },
+            { name: "대학가 토스트 5단계 굽기 장인", desc: "1단은 촉촉, 5단은 화재 경고 직전" },
+            { name: "편의점 삼각김밥 모서리 디자이너", desc: "삼각 비율을 예술로 끌어올림" },
+            { name: "드라마 배경 담당 스낵 장인", desc: "감자칩 소리가 너무 리얼해서 NG 유발" },
+            { name: "시절 급식 배식 명인", desc: "미트볼 갯수 세기로 유명" },
+            { name: "애니 배경 공터 전문가", desc: "늘 같은 배경을 바꾸지 않는 고집쟁이" },
+            { name: "공원 다람쥐 전담 안내원", desc: "다람쥐가 화나면 제일 먼저 혼남" },
+            { name: "지하철 종착역 눈물 감별사", desc: "왜 내릴 때 고개를 떨구는지 연구 중" },
+            { name: "패스트푸드 포장 예술가", desc: "감자튀김 배열로 평론을 받음" },
+            { name: "여름 축제 수박 깨기 심판", desc: "눈 가리고도 명중시키면 박수 대신 탄식" },
+            { name: "반장 선거 유세사", desc: "한 표를 얻기 위한 말솜씨 훈련자" },
+            { name: "졸업식 날 모자 날리기 지도사", desc: "바람 불면 책임지지 않음" },
+            { name: "전철 내 졸음 컨트롤러", desc: "자는 척 전문가, 자리 놓치지 않음" },
+            { name: "포장마차 떡볶이 온도 측정사", desc: "뜨겁다는 말 안 나오면 실패로 간주" },
+            { name: "텀블러 스티커 큐레이터", desc: "자기 신념이 없으면 텀블러 못 씀" },
+            { name: "방구석 웹툰 연재 작가 지망생", desc: "10년째 1화 구상 중" },
+            { name: "자판기 앞 음료 고민 상담사", desc: "누르면 후회할까 봐 10분씩 고민하는 자" },
+            { name: "실리콘밸리 헬스볼 제작 도우미", desc: "단백질만 40g이 넘는 공을 제작함" },
+            { name: "인스타 릴스 배경음 큐레이터", desc: "빠르게 잘라 써야 귀에 감긴다고 주장" },
+            { name: "만화책 냄새 감별 장인", desc: "1권에서 3권으로 갈수록 냄새가 깊어짐" },
+            { name: "틱톡 밈 반응 분석가", desc: "1초 표정차이로 웃음 포인트 결정" },
+            { name: "유튜브 쇼츠 제목 장인", desc: "제목이 곧 승부라는 철학으로 살아감" },
+            { name: "오코노미야키 뒤집기 수련생", desc: "한 번에 못 뒤집으면 하루 금식" },
+            { name: "편의점 도시락 재배열러", desc: "김치와 계란을 늘 왼쪽에 두는 원칙주의자" },
+            { name: "홈파티 접시 감성 코디네이터", desc: "종이접시조차 테마 있어야 진심" },
+            { name: "감정 표현 땀 조절사", desc: "애니메이션 캐릭터 이마 땀방울 컨트롤 담당" },
+            { name: "마트 시식 타이밍 공략꾼", desc: "시식 나오기 직전 줄서는 전략가" },
+            { name: "전자레인지 타이머 철학자", desc: "1:11이냐 0:59냐로 삶의 균형을 논함" },
+            { name: "눈 내리는 날 사진 각도 조율사", desc: "하늘 각도 15도 이상은 감성 아님" },
+            { name: "삼각김밥 속 재료 추리 전문가", desc: "한 입 먹고 무슨 맛인지 맞히기 선수" },
+            { name: "커피 리필 무한 반복 시도자", desc: "리필 몇 번까지가 예의인지 실험 중" }
+        ];
+
+        let currentResult = null;
+        let isRevealing = false;
+
+        function revealPastLife() {
+            if (isRevealing) return;
+            
+            isRevealing = true;
+            const mirror = document.querySelector('.mirror');
+            const loading = document.querySelector('.loading');
+            const result = document.getElementById('result');
+            
+            mirror.style.pointerEvents = 'none';
+            loading.classList.add('show');
+            result.classList.remove('show');
+            
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * pastLives.length);
+                currentResult = pastLives[randomIndex];
+                
+                document.getElementById('characterNumber').textContent = `#${randomIndex + 1}`;
+                document.getElementById('characterName').textContent = currentResult.name;
+                document.getElementById('characterDesc').textContent = currentResult.desc;
+                
+                loading.classList.remove('show');
+                result.classList.add('show');
+                mirror.style.pointerEvents = 'auto';
+                isRevealing = false;
+            }, 2000);
+        }
+
+        function tryAgain() {
+            const result = document.getElementById('result');
+            result.classList.remove('show');
+            document.querySelector('.mirror-text').textContent = '클릭하세요';
+        }
+    </script>
+</body>
+</html>
