@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>지금 내 도플갱어는?</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
@@ -15,108 +15,204 @@
         
         body {
             font-family: 'Noto Sans KR', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5f27cd 100%);
             min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 10px 15px 10px 15px;
             color: white;
+            overflow: hidden;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         
         .title {
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
             font-weight: 900;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            background: linear-gradient(45deg, #fff, #e3f2fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            margin-bottom: 10px;
             opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .discover-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #ff9ff3);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        .discover-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .discover-btn:hover:before {
+            left: 100%;
+        }
+        
+        .discover-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        
+        .discover-btn:active {
+            transform: translateY(-1px) scale(1.02);
         }
         
         .map-container {
             background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-radius: 25px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .map-container:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            pointer-events: none;
         }
         
         .korea-map {
             width: 100%;
-            max-width: 600px;
+            max-width: 100%;
             height: auto;
             margin: 0 auto;
             position: relative;
+            flex: 1;
         }
         
         .map-svg {
             width: 100%;
-            height: 600px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            border: 2px solid #e9ecef;
+            height: clamp(400px, 60vh, 600px);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            border: 2px solid #dee2e6;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .region {
-            fill: #e3f2fd;
+            fill: url(#regionGradient);
             stroke: #1976d2;
-            stroke-width: 1;
+            stroke-width: 1.5;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.1));
         }
         
         .region:hover {
-            fill: #bbdefb;
+            fill: url(#regionHoverGradient);
+            stroke-width: 2;
+            transform: scale(1.02);
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
         }
         
         .region#seoul {
-            fill: #ff4757;
-            stroke: #ff3742;
-        }
-        
-        .region#seoul:hover {
-            fill: #ff6b7a;
-        }
-        
-        .region#seoul.active {
-            fill: #ff2f3e;
-            stroke: #c92a2a;
-            stroke-width: 3;
-        }
-        
-        .region.active {
-            fill: #2196f3;
-            stroke: #0d47a1;
+            fill: url(#seoulGradient);
+            stroke: #d32f2f;
             stroke-width: 2;
         }
         
+        .region#seoul:hover {
+            fill: url(#seoulHoverGradient);
+        }
+        
+        .region#seoul.active {
+            fill: url(#seoulActiveGradient);
+            stroke: #b71c1c;
+            stroke-width: 3;
+            animation: pulse 2s infinite;
+        }
+        
+        .region.active {
+            fill: url(#regionActiveGradient);
+            stroke: #0d47a1;
+            stroke-width: 3;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+            }
+            50% { 
+                transform: scale(1.05); 
+                filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));
+            }
+        }
+        
+        .flag {
+            font-size: 16px;
+            transition: all 0.3s ease;
+            animation: wave 1s infinite;
+        }
+        
         @keyframes wave {
-            0%, 100% { transform: rotate(-10deg); }
-            50% { transform: rotate(10deg); }
+            0%, 100% { transform: rotate(-5deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.1); }
         }
         
         .doppelganger-info {
-            background: rgba(255,255,255,0.95);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,249,250,0.95) 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 15px;
             color: #333;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             transform: translateY(20px);
             opacity: 0;
-            transition: all 0.5s ease;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
         }
         
         .doppelganger-info.show {
@@ -126,66 +222,96 @@
         
         .location-badge {
             display: inline-block;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #667eea, #764ba2, #5f27cd);
             color: white;
             padding: 8px 20px;
             border-radius: 25px;
             font-weight: bold;
             margin-bottom: 15px;
-            font-size: 1.1rem;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .location-badge:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
         
         .action-text {
-            font-size: 1.3rem;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         
         .action-emoji {
-            font-size: 2rem;
+            font-size: clamp(1.8rem, 5vw, 2.2rem);
             margin: 15px 0;
+            animation: bounce 2s infinite;
         }
         
-        .discover-btn {
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
-            border: none;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-        
-        .discover-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
-        }
-        
-        .discover-btn:active {
-            transform: translateY(0);
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
         
         @media (max-width: 768px) {
-            .title {
-                font-size: 2rem;
-            }
-            
-            .map-svg {
-                height: 400px;
+            body {
+                padding: 10px;
             }
             
             .map-container {
-                padding: 20px;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .map-svg {
+                height: clamp(350px, 50vh, 450px);
+            }
+            
+            .doppelganger-info {
+                padding: 15px;
+                margin-top: 10px;
             }
             
             .discover-btn {
-                padding: 12px 25px;
-                font-size: 1.1rem;
+                padding: 10px 20px;
+                margin-bottom: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .map-svg {
+                height: clamp(300px, 45vh, 400px);
+            }
+            
+            .region text {
+                font-size: 10px;
+            }
+        }
+        
+        @media (min-width: 1920px) {
+            .container {
+                max-width: 1200px;
+            }
+            
+            .map-svg {
+                height: clamp(600px, 70vh, 800px);
             }
         }
     </style>
@@ -200,86 +326,118 @@
         </button>
         
         <div class="map-container">
-            <svg class="map-svg" viewBox="0 0 600 600">
-                <!-- 경기도 (서울 주변 도넛 모양) -->
-                <path class="region" id="gyeonggi" d="M 100,100 L 200,100 L 220,120 L 220,200 L 180,220 L 120,220 L 80,180 L 80,120 Z M 125,125 A 25,25 0 1,1 175,125 A 25,25 0 1,1 175,175 A 25,25 0 1,1 125,175 A 25,25 0 1,1 125,125 Z" fill-rule="evenodd"/>
+            <svg class="map-svg" viewBox="0 0 600 650">
+                <defs>
+                    <linearGradient id="regionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e3f2fd;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#bbdefb;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="regionHoverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#bbdefb;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#90caf9;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="regionActiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2196f3;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#1976d2;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="seoulGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff3742;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="seoulHoverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff6b7a;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff5722;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="seoulActiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff2f3e;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#c92a2a;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- 경기도 -->
+                <path class="region" id="gyeonggi" d="M 80,100 L 220,100 L 240,120 L 240,200 L 200,220 L 140,220 L 100,200 L 60,160 L 60,120 Z M 125,125 A 25,25 0 1,1 175,125 A 25,25 0 1,1 175,175 A 25,25 0 1,1 125,175 A 25,25 0 1,1 125,125 Z" fill-rule="evenodd"/>
                 <text x="110" y="165" text-anchor="middle" font-size="12" font-weight="bold">경기</text>
                 <text class="flag" id="flag-gyeonggi" x="100" y="155" opacity="0">🚩</text>
                 
-                <!-- 서울 (경기도 가운데) -->
-                <rect class="region" id="seoul" x="125" y="125" width="50" height="50" rx="5" />
+                <!-- 서울 -->
+                <rect class="region" id="seoul" x="125" y="125" width="50" height="50" rx="8" />
                 <text x="150" y="145" text-anchor="middle" font-size="12" font-weight="bold" fill="white">서울</text>
                 <text class="flag" id="flag-seoul" x="140" y="140" opacity="0">🚩</text>
                 
                 <!-- 인천 -->
-                <circle class="region" id="incheon" cx="80" cy="140" r="18" />
-                <text x="80" y="120" text-anchor="middle" font-size="11" font-weight="bold">인천</text>
-                <text class="flag" id="flag-incheon" x="75" y="135" opacity="0">🚩</text>
+                <circle class="region" id="incheon" cx="70" cy="140" r="20" />
+                <text x="70" y="115" text-anchor="middle" font-size="11" font-weight="bold">인천</text>
+                <text class="flag" id="flag-incheon" x="65" y="135" opacity="0">🚩</text>
                 
                 <!-- 강원도 -->
-                <polygon class="region" id="gangwon" points="250,80 380,80 400,100 400,180 360,200 280,200 250,180 230,120" />
-                <text x="315" y="145" text-anchor="middle" font-size="12" font-weight="bold">강원</text>
-                <text class="flag" id="flag-gangwon" x="305" y="135" opacity="0">🚩</text>
+                <polygon class="region" id="gangwon" points="260,70 400,70 420,90 420,180 380,200 300,200 280,180 240,140 240,100" />
+                <text x="330" y="140" text-anchor="middle" font-size="12" font-weight="bold">강원</text>
+                <text class="flag" id="flag-gangwon" x="320" y="130" opacity="0">🚩</text>
+                
+                <!-- 울릉도 -->
+                <circle class="region" id="ulleungdo" cx="450" cy="120" r="12" />
+                <text x="450" y="105" text-anchor="middle" font-size="9" font-weight="bold">울릉도</text>
+                <text class="flag" id="flag-ulleungdo" x="445" y="115" opacity="0">🚩</text>
                 
                 <!-- 충청북도 -->
-                <polygon class="region" id="chungbuk" points="200,200 280,200 300,220 300,280 260,300 220,300 180,280 180,220" />
-                <text x="240" y="255" text-anchor="middle" font-size="11" font-weight="bold">충북</text>
-                <text class="flag" id="flag-chungbuk" x="230" y="245" opacity="0">🚩</text>
+                <polygon class="region" id="chungbuk" points="200,200 300,200 320,220 320,280 280,300 240,300 200,280 180,240 180,220" />
+                <text x="250" y="255" text-anchor="middle" font-size="11" font-weight="bold">충북</text>
+                <text class="flag" id="flag-chungbuk" x="240" y="245" opacity="0">🚩</text>
                 
                 <!-- 충청남도 -->
-                <polygon class="region" id="chungnam" points="120,220 180,220 180,280 200,300 180,320 120,320 100,300 100,240" />
-                <text x="140" y="275" text-anchor="middle" font-size="11" font-weight="bold">충남</text>
-                <text class="flag" id="flag-chungnam" x="130" y="265" opacity="0">🚩</text>
+                <polygon class="region" id="chungnam" points="100,220 180,220 180,280 200,300 180,320 120,320 100,300 80,260 80,240" />
+                <text x="130" y="275" text-anchor="middle" font-size="11" font-weight="bold">충남</text>
+                <text class="flag" id="flag-chungnam" x="120" y="265" opacity="0">🚩</text>
                 
                 <!-- 대전 -->
-                <circle class="region" id="daejeon" cx="160" cy="280" r="15" />
+                <circle class="region" id="daejeon" cx="160" cy="280" r="16" />
                 <text x="160" y="305" text-anchor="middle" font-size="10" font-weight="bold">대전</text>
                 <text class="flag" id="flag-daejeon" x="155" y="275" opacity="0">🚩</text>
                 
                 <!-- 전라북도 -->
-                <polygon class="region" id="jeonbuk" points="100,320 180,320 200,340 200,400 160,420 120,420 80,400 80,340" />
-                <text x="140" y="375" text-anchor="middle" font-size="11" font-weight="bold">전북</text>
-                <text class="flag" id="flag-jeonbuk" x="130" y="365" opacity="0">🚩</text>
+                <polygon class="region" id="jeonbuk" points="80,320 180,320 200,340 200,400 160,420 120,420 80,400 60,360 60,340" />
+                <text x="130" y="375" text-anchor="middle" font-size="11" font-weight="bold">전북</text>
+                <text class="flag" id="flag-jeonbuk" x="120" y="365" opacity="0">🚩</text>
                 
                 <!-- 전라남도 -->
-                <polygon class="region" id="jeonnam" points="80,420 160,420 180,440 180,500 140,520 100,520 60,500 60,440" />
-                <text x="120" y="475" text-anchor="middle" font-size="11" font-weight="bold">전남</text>
-                <text class="flag" id="flag-jeonnam" x="110" y="465" opacity="0">🚩</text>
+                <polygon class="region" id="jeonnam" points="60,420 160,420 180,440 180,500 140,520 100,520 60,500 40,460 40,440" />
+                <text x="110" y="475" text-anchor="middle" font-size="11" font-weight="bold">전남</text>
+                <text class="flag" id="flag-jeonnam" x="100" y="465" opacity="0">🚩</text>
                 
                 <!-- 광주 -->
-                <circle class="region" id="gwangju" cx="120" cy="420" r="12" />
-                <text x="120" y="445" text-anchor="middle" font-size="10" font-weight="bold">광주</text>
-                <text class="flag" id="flag-gwangju" x="115" y="415" opacity="0">🚩</text>
+                <circle class="region" id="gwangju" cx="110" cy="420" r="14" />
+                <text x="110" y="445" text-anchor="middle" font-size="10" font-weight="bold">광주</text>
+                <text class="flag" id="flag-gwangju" x="105" y="415" opacity="0">🚩</text>
                 
                 <!-- 경상북도 -->
-                <polygon class="region" id="gyeongbuk" points="300,200 400,200 420,220 420,320 380,340 320,340 300,320 280,280 280,220" />
-                <text x="350" y="275" text-anchor="middle" font-size="11" font-weight="bold">경북</text>
-                <text class="flag" id="flag-gyeongbuk" x="340" y="265" opacity="0">🚩</text>
+                <polygon class="region" id="gyeongbuk" points="320,200 420,200 440,220 440,320 400,340 340,340 320,320 300,280 300,220" />
+                <text x="370" y="275" text-anchor="middle" font-size="11" font-weight="bold">경북</text>
+                <text class="flag" id="flag-gyeongbuk" x="360" y="265" opacity="0">🚩</text>
                 
                 <!-- 대구 -->
-                <circle class="region" id="daegu" cx="340" cy="320" r="15" />
-                <text x="340" y="345" text-anchor="middle" font-size="10" font-weight="bold">대구</text>
-                <text class="flag" id="flag-daegu" x="335" y="315" opacity="0">🚩</text>
+                <circle class="region" id="daegu" cx="360" cy="320" r="16" />
+                <text x="360" y="345" text-anchor="middle" font-size="10" font-weight="bold">대구</text>
+                <text class="flag" id="flag-daegu" x="355" y="315" opacity="0">🚩</text>
                 
                 <!-- 경상남도 -->
-                <polygon class="region" id="gyeongnam" points="280,340 380,340 400,360 400,440 360,460 300,460 280,440 260,400 260,360" />
-                <text x="330" y="405" text-anchor="middle" font-size="11" font-weight="bold">경남</text>
-                <text class="flag" id="flag-gyeongnam" x="320" y="395" opacity="0">🚩</text>
+                <polygon class="region" id="gyeongnam" points="300,340 400,340 420,360 420,440 380,460 320,460 300,440 280,400 280,360" />
+                <text x="350" y="405" text-anchor="middle" font-size="11" font-weight="bold">경남</text>
+                <text class="flag" id="flag-gyeongnam" x="340" y="395" opacity="0">🚩</text>
                 
                 <!-- 부산 -->
-                <circle class="region" id="busan" cx="380" cy="420" r="15" />
-                <text x="380" y="445" text-anchor="middle" font-size="10" font-weight="bold">부산</text>
-                <text class="flag" id="flag-busan" x="375" y="415" opacity="0">🚩</text>
+                <circle class="region" id="busan" cx="400" cy="420" r="16" />
+                <text x="400" y="445" text-anchor="middle" font-size="10" font-weight="bold">부산</text>
+                <text class="flag" id="flag-busan" x="395" y="415" opacity="0">🚩</text>
                 
                 <!-- 울산 -->
-                <circle class="region" id="ulsan" cx="400" cy="380" r="12" />
-                <text x="400" y="405" text-anchor="middle" font-size="10" font-weight="bold">울산</text>
-                <text class="flag" id="flag-ulsan" x="395" y="375" opacity="0">🚩</text>
+                <circle class="region" id="ulsan" cx="420" cy="380" r="14" />
+                <text x="420" y="405" text-anchor="middle" font-size="10" font-weight="bold">울산</text>
+                <text class="flag" id="flag-ulsan" x="415" y="375" opacity="0">🚩</text>
                 
                 <!-- 제주도 -->
-                <ellipse class="region" id="jeju" cx="120" cy="550" rx="30" ry="15" />
-                <text x="120" y="575" text-anchor="middle" font-size="11" font-weight="bold">제주</text>
-                <text class="flag" id="flag-jeju" x="110" y="545" opacity="0">🚩</text>
+                <ellipse class="region" id="jeju" cx="150" cy="580" rx="35" ry="18" />
+                <text x="150" y="610" text-anchor="middle" font-size="11" font-weight="bold">제주</text>
+                <text class="flag" id="flag-jeju" x="140" y="575" opacity="0">🚩</text>
             </svg>
             
             <div class="doppelganger-info" id="doppelgangerInfo">
@@ -351,18 +509,33 @@
             { location: "서울,강동구", action: "전자레인지에서 삼각김밥 꺼내는 중", region: "seoul", emoji: "🍙" },
             { location: "강원도,춘천시", action: "냄비에 감자 삶는 중", region: "gangwon", emoji: "🥔" },
             { location: "서울,강남구", action: "여행가려고 짐 싸는 중", region: "seoul", emoji: "🧳" },
-            { location: "경기도,남양주시", action: "강아지 똥 치우는 중", region: "gyeonggi", emoji: "🐕" }
+            { location: "경기도,남양주시", action: "강아지 똥 치우는 중", region: "gyeonggi", emoji: "🐕" },
+            { location: "제주도,제주시", action: "바다를 보며 명상하는 중", region: "jeju", emoji: "🌊" },
+            { location: "제주도,서귀포시", action: "감귤 따먹는 중", region: "jeju", emoji: "🍊" },
+            { location: "제주도,제주시", action: "돌하르방과 셀카 찍는 중", region: "jeju", emoji: "🗿" },
+            { location: "울릉도", action: "독도새우 먹는 중", region: "ulleungdo", emoji: "🦐" },
+            { location: "울릉도", action: "바람 소리 들으며 혼자만의 시간 보내는 중", region: "ulleungdo", emoji: "🌬️" },
+            { location: "충청북도,청주시", action: "치킨 먹으면서 맥주 마시는 중", region: "chungbuk", emoji: "🍗" },
+            { location: "전라남도,목포시", action: "낙지볶음 먹는 중", region: "jeonnam", emoji: "🐙" },
+            { location: "전라남도,여수시", action: "밤바다 바라보며 생각에 잠긴 중", region: "jeonnam", emoji: "🌙" }
         ];
         
         let currentDoppelganger = null;
+        let isAnimating = false;
         
         function discoverDoppelganger() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
             clearPreviousSelection();
             
             const randomIndex = Math.floor(Math.random() * doppelgangerData.length);
             currentDoppelganger = doppelgangerData[randomIndex];
             
-            showDoppelganger(currentDoppelganger);
+            setTimeout(() => {
+                showDoppelganger(currentDoppelganger);
+                isAnimating = false;
+            }, 300);
         }
         
         function clearPreviousSelection() {
@@ -373,6 +546,9 @@
             document.querySelectorAll('.flag').forEach(flag => {
                 flag.style.opacity = '0';
             });
+            
+            const info = document.getElementById('doppelgangerInfo');
+            info.classList.remove('show');
         }
         
         function showDoppelganger(doppelganger) {
@@ -383,19 +559,40 @@
             const actionEmoji = document.getElementById('actionEmoji');
             const actionText = document.getElementById('actionText');
             
-            region.classList.add('active');
-            flag.style.opacity = '1';
+            if (region) {
+                region.classList.add('active');
+            }
+            
+            if (flag) {
+                flag.style.opacity = '1';
+            }
             
             locationBadge.textContent = doppelganger.location;
             actionEmoji.textContent = doppelganger.emoji;
             actionText.textContent = doppelganger.action;
             
-            info.classList.add('show');
+            setTimeout(() => {
+                info.classList.add('show');
+            }, 100);
         }
         
         document.addEventListener('DOMContentLoaded', function() {
             const info = document.getElementById('doppelgangerInfo');
-            info.classList.add('show');
+            setTimeout(() => {
+                info.classList.add('show');
+            }, 500);
+        });
+        
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.classList.contains('discover-btn')) {
+                e.target.style.transform = 'translateY(-1px) scale(1.02)';
+            }
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (e.target.classList.contains('discover-btn')) {
+                e.target.style.transform = '';
+            }
         });
     </script>
 </body>
