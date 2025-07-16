@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고양이 찾기 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .header {
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .timer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .timer-display {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .timer-bar {
+            width: 120px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336);
+            transition: width 0.1s ease;
+            border-radius: 3px;
+        }
+
+        .level-section {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .target-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .target-preview {
+            width: 35px;
+            height: 35px;
+            background: #e6b3ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 650px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .target-card {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #e6b3ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            cursor: pointer;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .sticker {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            z-index: 2;
+        }
+
+        .sticker-type-1 {
+            background: #ff9999;
+        }
+
+        .sticker-type-2 {
+            background: #99ccff;
+        }
+
+        .sticker-type-3 {
+            background: #99ff99;
+        }
+
+        .sticker-type-4 {
+            background: #ffcc99;
+        }
+
+        .sticker:hover {
+            transform: scale(1.1);
+        }
+
+        .sticker.removing {
+            animation: removeSticker 0.5s ease-out forwards;
+        }
+
+        @keyframes removeSticker {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(180deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .game-over-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ff5722;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            z-index: 1000;
+            display: none;
+            text-align: center;
+            max-width: 350px;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #4caf50;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 18px;
+            z-index: 1000;
+            display: none;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .restart-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .restart-btn:hover {
+            background: #ff5252;
+        }
+
+        .game-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                max-width: 350px;
+                height: 550px;
+            }
+            
+            .target-card, .sticker {
+                width: 50px;
+                height: 50px;
+                font-size: 25px;
+            }
+
+            .target-preview {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏠 집 나간 고양이</h1>
+        <div class="game-info">
+            <div class="timer-section">
+                <div class="timer-display" id="timerDisplay">01:00</div>
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timerFill"></div>
+                </div>
+            </div>
+            <div class="level-section">
+                레벨 <span id="level">1</span>
+            </div>
+        </div>
+        <div class="target-display">
+            <span>찾을 고양이:</span>
+            <div class="target-preview" id="targetPreview">🐱</div>
+        </div>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+    </div>
+
+    <div class="success-message" id="successMessage">
+        <div>🎉 고양이를 찾았습니다!</div>
+        <div>다음 레벨로...</div>
+    </div>
+
+    <div class="game-over-message" id="gameOverMessage">
+        <div>⏰ 시간 끝!</div>
+        <div>최고 레벨: <span id="finalLevel"></span></div>
+        <button class="restart-btn" onclick="restartGame()">다시 시작</button>
+    </div>
+
+    <script>
+        let gameState = {
+            level: 1,
+            timeLeft: 60,
+            isGameActive: true,
+            timerInterval: null
+        };
+
+        const animals = ['🐶', '🐵', '🐸', '🐰', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐭', '🐹', '🐻', '🐺', '🦊', '🐴', '🦄', '🐲', '🐉'];
+        const targetAnimal = '🐱';
+
+        let stickerElements = [];
+        let targetElement = null;
+
+        function initGame() {
+            gameState.isGameActive = true;
+            stickerElements = [];
+            
+            const container = document.getElementById('gameContainer');
+            container.innerHTML = '';
+            container.classList.remove('game-disabled');
+            
+            createTargetCard();
+            createStickers();
+            updateDisplay();
+        }
+
+        function startTimer() {
+            gameState.timeLeft = 60;
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerDisplay();
+                
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.timeLeft / 60);
+            const seconds = gameState.timeLeft % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerElement = document.getElementById('timerDisplay');
+            const timerFill = document.getElementById('timerFill');
+            
+            timerElement.textContent = display;
+            
+            const percentage = (gameState.timeLeft / 60) * 100;
+            timerFill.style.width = percentage + '%';
+            
+            if (gameState.timeLeft <= 10) {
+                timerElement.style.color = '#ff5252';
+                timerFill.style.background = '#f44336';
+            }
+        }
+
+        function createTargetCard() {
+            const container = document.getElementById('gameContainer');
+            
+            const card = document.createElement('div');
+            card.className = 'target-card';
+            card.textContent = targetAnimal;
+            
+            const maxX = 340;
+            const maxY = 540;
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            
+            card.style.left = x + 'px';
+            card.style.top = y + 'px';
+            
+            card.addEventListener('click', targetFound);
+            card.addEventListener('touchstart', targetFound);
+            
+            targetElement = card;
+            container.appendChild(card);
+        }
+
+        function createStickers() {
+            const totalStickers = Math.min(15 + (gameState.level - 1) * 8, 70);
+            
+            const container = document.getElementById('gameContainer');
+            
+            for (let i = 0; i < totalStickers; i++) {
+                const sticker = document.createElement('div');
+                const stickerType = (i % 4) + 1;
+                sticker.className = `sticker sticker-type-${stickerType}`;
+                
+                const animalIndex = Math.floor(Math.random() * animals.length);
+                sticker.textContent = animals[animalIndex];
+                
+                const maxX = 340;
+                const maxY = 540;
+                const x = Math.random() * maxX;
+                const y = Math.random() * maxY;
+                
+                sticker.style.left = x + 'px';
+                sticker.style.top = y + 'px';
+                
+                sticker.addEventListener('click', removeSticker);
+                sticker.addEventListener('touchstart', removeSticker);
+                
+                stickerElements.push(sticker);
+                container.appendChild(sticker);
+            }
+        }
+
+        function removeSticker(event) {
+            event.preventDefault();
+            
+            if (!gameState.isGameActive) return;
+            
+            const sticker = event.target;
+            sticker.classList.add('removing');
+            
+            setTimeout(() => {
+                if (sticker.parentNode) {
+                    sticker.parentNode.removeChild(sticker);
+                }
+                
+                const index = stickerElements.indexOf(sticker);
+                if (index > -1) {
+                    stickerElements.splice(index, 1);
+                }
+            }, 500);
+        }
+
+        function targetFound(event) {
+            event.preventDefault();
+            
+            if (!gameState.isGameActive) return;
+            
+            showSuccessMessage();
+            
+            setTimeout(() => {
+                nextLevel();
+            }, 1000);
+        }
+
+        function nextLevel() {
+            gameState.level++;
+            document.getElementById('successMessage').style.display = 'none';
+            initGame();
+        }
+
+        function showSuccessMessage() {
+            document.getElementById('successMessage').style.display = 'block';
+        }
+
+        function endGame() {
+            gameState.isGameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            document.getElementById('gameContainer').classList.add('game-disabled');
+            document.getElementById('finalLevel').textContent = gameState.level;
+            document.getElementById('gameOverMessage').style.display = 'block';
+        }
+
+        function restartGame() {
+            gameState.level = 1;
+            gameState.timeLeft = 60;
+            
+            document.getElementById('gameOverMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('timerDisplay').style.color = 'white';
+            document.getElementById('timerFill').style.background = 'linear-gradient(90deg, #4caf50, #ffeb3b, #f44336)';
+            
+            initGame();
+            startTimer();
+        }
+
+        function updateDisplay() {
+            document.getElementById('level').textContent = gameState.level;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGame();
+            startTimer();
+        });
+        
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
