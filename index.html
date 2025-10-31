@@ -1,289 +1,840 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>헛둘셋넷의 월드</title>
-  <style>
-    /* 기존 스타일 유지 */
-    :root {
-      --bg1: #fdfbff;
-      --bg2: #e9f7ff;
-      --bg3: #d3edff;
-      --fg: #222222;
-      --card: #ffffff;
-      --accent: #0077ff;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(130deg, var(--bg1), var(--bg2), var(--bg3));
-      background-size: 400% 400%;
-      animation: bgMove 25s ease infinite;
-      color: var(--fg);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      overflow: hidden;
-      position: relative;
-    }
-    @keyframes bgMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    h1 {
-      margin: 20px 0 10px;
-      font-size: 48px;
-      color: var(--accent);
-      text-align: center;
-      user-select: none;
-      z-index: 10;
-    }
-    #datetime {
-      margin-bottom: 20px;
-      font-size: 16px;
-      color: #555555;
-      user-select: none;
-      z-index: 10;
-    }
-    #grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 20px;
-      width: 90vw;
-      max-width: 1000px;
-      padding-bottom: 80px;
-      z-index: 10;
-    }
-    button.game {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--card);
-      border: none;
-      border-radius: 14px;
-      padding: 24px;
-      font-size: 18px;
-      color: var(--fg);
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
-    button.game span.icon {
-      font-size: 38px;
-      margin-bottom: 12px;
-    }
-    button.game:hover {
-      background: #f0f9ff;
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-    }
-    #loader {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: none;
-      z-index: 10;
-    }
-    body.playing h1,
-    body.playing #grid,
-    body.playing #datetime {
-      display: none;
-    }
-    body.playing #loader {
-      display: block;
-    }
-    footer {
-      position: fixed;
-      bottom: 8px;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      font-size: 14px;
-      color: #666666;
-      pointer-events: none;
-      user-select: none;
-      z-index: 10;
-    }
-    body.playing footer { display: none; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 우리의 랜덤 데이트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    #backBtn {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 2000;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      background: #0077ff;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            height: 100vh;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-    #character {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      width: 120px;
-      height: 120px;
-      z-index: 2000;
-      user-select: none;
-      pointer-events: none;
-      animation: floatAnim 3s ease-in-out infinite;
-      transition: opacity 0.3s ease;
-      opacity: 1;
-    }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            max-width: 450px;
+            width: 100%;
+            height: 95vh;
+            animation: fadeIn 0.5s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-    @keyframes floatAnim {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    /* 병아리 SVG 스타일 */
-    #character svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
-    }
+        h1 {
+            text-align: center;
+            color: #ff6b9d;
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
 
-    #adBanner {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 68px;
-      background: #fff;
-      border-top: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #666;
-      z-index: 1500;
-    }
-  </style>
+        .subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+            gap: 8px;
+        }
+
+        .option-btn {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: none;
+            padding: 10px 6px;
+            border-radius: 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #333;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(252, 182, 159, 0.3);
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(252, 182, 159, 0.5);
+        }
+
+        .option-btn.active {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .start-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 16px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            margin-top: 10px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .start-btn.pink {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+        }
+
+        .start-btn.pink:hover {
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5);
+        }
+
+        .timeline-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .timeline-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .timeline-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .timeline-wrapper::-webkit-scrollbar-thumb {
+            background: #ff6b9d;
+            border-radius: 10px;
+        }
+
+        .timeline-summary {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe5ec 100%);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            color: #ff6b9d;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding-left: 35px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 13px;
+            top: 15px;
+            bottom: 15px;
+            width: 2px;
+            background: linear-gradient(180deg, #ff6b9d 0%, #ff8fab 100%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 15px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -28px;
+            top: 3px;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border: 2px solid #ff6b9d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 12px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .timeline-label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .timeline-value {
+            font-size: 15px;
+            color: #ff6b9d;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            padding-right: 35px;
+        }
+
+        .mini-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(252, 182, 159, 0.3);
+        }
+
+        .mini-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 3px 12px rgba(252, 182, 159, 0.5);
+        }
+
+        .mini-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .container {
+                padding: 15px;
+                height: 98vh;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+                margin-bottom: 15px;
+            }
+
+            .section {
+                margin-bottom: 15px;
+            }
+
+            .section-title {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            .option-btn {
+                padding: 9px 5px;
+                font-size: 12px;
+            }
+
+            .start-btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            .timeline-dot {
+                width: 24px;
+                height: 24px;
+                left: -27px;
+                font-size: 12px;
+            }
+
+            .timeline-value {
+                font-size: 14px;
+                padding-right: 32px;
+            }
+
+            .mini-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 13px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <button id="backBtn">← 뒤로가기</button>
+    <div class="container">
+        <div id="settingsScreen">
+            <h1>💕 우리의 랜덤 데이트</h1>
+            <p class="subtitle">오늘의 완벽한 데이트를 만들어보세요!</p>
 
-  <div id="character" aria-label="귀여운 병아리 캐릭터">
-    <!-- 귀여운 병아리 SVG 애니메이션 -->
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" >
-      <g>
-        <circle cx="32" cy="32" r="30" fill="#FFD966" />
-        <circle cx="22" cy="32" r="8" fill="#FFF3CC"/>
-        <circle cx="42" cy="32" r="8" fill="#FFF3CC"/>
-        <circle cx="22" cy="32" r="4" fill="#000"/>
-        <circle cx="42" cy="32" r="4" fill="#000"/>
-        <path d="M24 40 Q32 48 40 40" stroke="#000" stroke-width="2" fill="none" />
-        <path d="M18 20 L26 28 L34 20" fill="#FFB84C"/>
-        <path d="M46 20 L38 28 L30 20" fill="#FFB84C"/>
-      </g>
-      <animateTransform attributeName="transform" attributeType="XML"
-        type="rotate" from="-6 32 32" to="6 32 32" dur="2.5s" repeatCount="indefinite"/>
-    </svg>
-  </div>
+            <div class="section">
+                <div class="section-title">☀️ 날씨</div>
+                <div class="button-group">
+                    <button class="option-btn" onclick="selectWeather('맑음')">☀️ 맑음</button>
+                    <button class="option-btn" onclick="selectWeather('흐림')">☁️ 흐림</button>
+                    <button class="option-btn" onclick="selectWeather('비')">🌧️ 비</button>
+                    <button class="option-btn" onclick="selectWeather('눈')">❄️ 눈</button>
+                </div>
+            </div>
 
-  <h1>헛둘셋넷의 월드</h1>
-  <div id="datetime"></div>
-  <div id="grid"></div>
-  <iframe id="loader" src="" scrolling="no"></iframe>
-  <footer id="copyright"></footer>
-  <div id="adBanner">[TEST 광고 배너]</div>
+            <div class="section">
+                <div class="section-title">🌡️ 온도</div>
+                <div class="button-group">
+                    <button class="option-btn" onclick="selectTemp('매우더움')">🔥 매우더움</button>
+                    <button class="option-btn" onclick="selectTemp('더움')">☀️ 더움</button>
+                    <button class="option-btn" onclick="selectTemp('적당')">🌸 적당</button>
+                    <button class="option-btn" onclick="selectTemp('쌀쌀')">🍂 쌀쌀</button>
+                    <button class="option-btn" onclick="selectTemp('추움')">❄️ 추움</button>
+                </div>
+            </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+            <div class="section">
+                <div class="section-title">💪 텐션</div>
+                <div class="button-group">
+                    <button class="option-btn" onclick="selectVibe('완전여유')">🛋️ 완전여유</button>
+                    <button class="option-btn" onclick="selectVibe('여유')">😌 여유</button>
+                    <button class="option-btn" onclick="selectVibe('보통')">😊 보통</button>
+                    <button class="option-btn" onclick="selectVibe('활동적')">💪 활동적</button>
+                    <button class="option-btn" onclick="selectVibe('완전빡세')">🔥 완전빡세</button>
+                </div>
+            </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCu11iqjyQ0uvq8ikIE5jnW7tB8cCPf5DA",
-      authDomain: "test-2986a.firebaseapp.com",
-      projectId: "test-2986a",
-      storageBucket: "test-2986a.firebasestorage.app",
-      messagingSenderId: "774502147365",
-      appId: "1:774502147365:web:eab2dddc3ec86642e6a6cc",
-      measurementId: "G-E6D45R514C"
-    };
+            <button class="start-btn" onclick="startRandom()">✨ 데이트 뽑기 시작!</button>
+        </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    signInAnonymously(getAuth(app)).catch(e => console.error('익명 로그인 실패', e));
+        <div id="randomScreen" class="hidden">
+            <h1>💕 데이트 코스</h1>
+            <p class="subtitle">버튼을 눌러 오늘의 데이트를 결정하세요!</p>
 
-    var games = [
-      { title: '운세 가챠', file: '운세가챠.html', icon: '🔮' },
-      { title: '지금 내 도플갱어는?', file: '지금내도플갱어는.html', icon: '🎰' },
-      { title: '나랑 어울리는 개는?', file: '나랑어울리는개는.html', icon: '🐶' },
-      { title: '전생 거울', file: '전생거울.html', icon: '🔍' },
-      { title: '로또 1등에 당첨된다면?', file: '로또당첨.html', icon: '🎰' },
-      { title: '집 나간 고양이', file: '집나간고양이.html', icon: '🏠' },
-      { title: '동물 테트리스', file: '동물테트리스.html', icon: '🦁' },
-      { title: '벽돌 깨기', file: '벽돌깨기.html', icon: '🏓' }
-    ];
+            <div class="timeline-wrapper">
+                <div class="timeline-summary">
+                    <div class="summary-title">💝 오늘의 데이트 일정</div>
+                    
+                    <div class="timeline-container">
+                        <div class="timeline-item">
+                            <div class="timeline-dot">🌤️</div>
+                            <div class="timeline-content">
+                                <div class="timeline-label">날씨 & 텐션</div>
+                                <div class="timeline-value">
+                                    <span id="summaryWeather">-</span> / 
+                                    <span id="summaryTemp">-</span> / 
+                                    <span id="summaryVibe">-</span>
+                                </div>
+                            </div>
+                        </div>
 
-    var grid = document.getElementById('grid');
-    var loader = document.getElementById('loader');
-    var character = document.getElementById('character');
-    var current = '';
+                        <div class="timeline-item">
+                            <div class="timeline-dot">🕐</div>
+                            <div class="timeline-content">
+                                <div class="timeline-label">13:30 만남</div>
+                                <div class="timeline-value">
+                                    <span id="summaryDay">?</span> • 
+                                    <span id="summaryLocation">?</span>
+                                </div>
+                                <button class="mini-btn" onclick="randomDay(); randomLocation();">🔄</button>
+                            </div>
+                        </div>
 
-    function loadGame(file) {
-      if (file !== current) {
-        loader.src = file;
-        current = file;
-        document.body.classList.add('playing');
-        character.style.opacity = '0'; // 게임 로드 시 캐릭터 숨김
-      }
-    }
+                        <div class="timeline-item">
+                            <div class="timeline-dot">🍱</div>
+                            <div class="timeline-content">
+                                <div class="timeline-label">점심시간</div>
+                                <div class="timeline-value" id="summaryLunch">?</div>
+                                <button class="mini-btn" onclick="randomLunch()">🔄</button>
+                            </div>
+                        </div>
 
-    async function recordClick(title) {
-      try {
-        const docRef = doc(db, "game_clicks", title);
-        const docSnap = await getDoc(docRef);
+                        <div class="timeline-item">
+                            <div class="timeline-dot">☕</div>
+                            <div class="timeline-content">
+                                <div class="timeline-label">오후활동</div>
+                                <div class="timeline-value" id="summaryAfternoon">?</div>
+                                <button class="mini-btn" onclick="randomAfternoon()">🔄</button>
+                            </div>
+                        </div>
 
-        if (docSnap.exists()) {
-          await updateDoc(docRef, {
-            count: increment(1)
-          });
-        } else {
-          await setDoc(docRef, { count: 1 });
+                        <div class="timeline-item">
+                            <div class="timeline-dot">🍽️</div>
+                            <div class="timeline-content">
+                                <div class="timeline-label">저녁식사</div>
+                                <div class="timeline-value" id="summaryDinner">?</div>
+                                <button class="mini-btn" onclick="randomDinner()">🔄</button>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot">🌙</div>
+                            <div class="timeline-content">
+                                <div class="timeline-label">밤활동</div>
+                                <div class="timeline-value" id="summaryNight">?</div>
+                                <button class="mini-btn" onclick="randomNight()">🔄</button>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot">💕</div>
+                            <div class="timeline-content">
+                                <div class="timeline-label">21:00~22:00 헤어짐</div>
+                                <div class="timeline-value">좋은 하루 보내세요!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="start-btn pink" onclick="randomAll()">🎲 데이트 코스 한번에 뽑기!</button>
+            <button class="start-btn hidden" id="resetBtn" onclick="resetAll()">🔄 처음으로</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedWeather = '';
+        let selectedTemp = '';
+        let selectedVibe = '';
+        let selectedLocation = '';
+        let selectedStation = '';
+
+        const days = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+        const locations = ['홍대', '신촌', '건대', '혜화/대학로', '성신여대', '왕십리', '노원', '수유', '연신내', '상수', '망원'];
+        
+        const stationInfo = {
+            '홍대': ['홍대입구역 9번출구', '홍대입구역 5번출구', '상수역 1번출구', '합정역 7번출구'],
+            '신촌': ['신촌역 2번출구', '신촌역 3번출구', '이대역 2번출구', '이대역 3번출구'],
+            '건대': ['건대입구역 3번출구', '건대입구역 5번출구', '건대입구역 2번출구'],
+            '혜화/대학로': ['혜화역 2번출구', '혜화역 1번출구', '혜화역 4번출구'],
+            '성신여대': ['성신여대입구역 4번출구', '성신여대입구역 1번출구', '한성대입구역 6번출구'],
+            '왕십리': ['왕십리역 7번출구', '왕십리역 4번출구', '왕십리역 2번출구'],
+            '노원': ['노원역 1번출구', '노원역 3번출구', '상계역 1번출구'],
+            '수유': ['수유역 3번출구', '수유역 4번출구', '미아사거리역 2번출구'],
+            '연신내': ['연신내역 2번출구', '연신내역 6번출구', '역촌역 1번출구'],
+            '상수': ['상수역 1번출구', '상수역 2번출구', '합정역 1번출구'],
+            '망원': ['망원역 2번출구', '망원역 1번출구', '합정역 9번출구']
+        };
+
+        const restaurants = {
+            '홍대': {
+                '한식': ['명동칼국수', '진진바라', '맛있는녀석들삼겹살', '홍대개미'],
+                '중식': ['도원', '차이나팩토리', '홍콩반점0410', '미미네반점'],
+                '일식': ['스시효', '야끼니꾸', '돈키호테', '츠루동동'],
+                '양식': ['빕스', '애슐리', '파스토보이', '더플레이스'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '국대떡볶이'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '또래오래'],
+                '피자': ['피자스쿨', '피자헛', '파파존스', '미스터피자'],
+                '버거': ['수제버거집', '버거킹', '맘스터치', '크라제버거'],
+                '삼겹살': ['대패집', '무한갈비', '구이가', '연탄집'],
+                '곱창': ['홍대곱창', '막창이야기', '엽기곱창', '곱창이'],
+                '회': ['노량진수산', '스시효', '광어마을', '제주은갈치'],
+                '고기': ['숯불갈비', '소금구이', '한우마을', '등심집']
+            },
+            '신촌': {
+                '한식': ['신촌설렁탕', '국밥집', '돼지국밥', '순두부백반'],
+                '중식': ['차이나팩토리', '홍콩반점', '중화루', '미미네'],
+                '일식': ['스시집', '돈카츠킹', '라멘야', '우동한그릇'],
+                '양식': ['투썸플레이스', '애슐리', '빕스', '파스타'],
+                '분식': ['신전떡볶이', '죠스떡볶이', '엽기떡볶이', '국대떡볶이'],
+                '치킨': ['교촌치킨', '네네치킨', 'BBQ', 'BHC'],
+                '피자': ['피자스쿨', '도미노피자', '피자헛', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '롯데리아', '크라제버거']
+            },
+            '건대': {
+                '한식': ['건대쭈꾸미', '국밥집', '삼겹살', '된장찌개'],
+                '중식': ['차이나팩토리', '짬뽕집', '짜장면집', '중화루'],
+                '일식': ['스시집', '돈카츠', '라멘', '우동'],
+                '양식': ['파스타집', '스테이크', '빕스', '애슐리'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '국대떡볶이'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '파파존스'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '수제버거']
+            },
+            '혜화/대학로': {
+                '한식': ['대학로국밥', '한정식', '쌈밥집', '순두부'],
+                '중식': ['차이나팩토리', '짬뽕집', '중화루', '홍콩반점'],
+                '일식': ['스시집', '돈카츠', '라멘', '덮밥'],
+                '양식': ['파스타집', '스테이크', '리조또', '피자'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '김밥천국'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '수제버거']
+            },
+            '성신여대': {
+                '한식': ['성신쭈꾸미', '국밥집', '삼겹살', '김치찌개'],
+                '중식': ['차이나팩토리', '짬뽕집', '짜장면', '중화루'],
+                '일식': ['스시', '돈카츠', '라멘', '우동'],
+                '양식': ['파스타', '스테이크', '빕스', '피자'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '국대떡볶이'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '롯데리아']
+            },
+            '왕십리': {
+                '한식': ['왕십리곱창', '국밥집', '삼겹살', '쭈꾸미'],
+                '중식': ['차이나팩토리', '짬뽕집', '중화루', '홍콩반점'],
+                '일식': ['스시', '돈카츠', '라멘', '덮밥'],
+                '양식': ['파스타', '스테이크', '피자', '빕스'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '김밥천국'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '수제버거']
+            },
+            '노원': {
+                '한식': ['노원국밥', '삼겹살', '김치찌개', '순두부'],
+                '중식': ['차이나팩토리', '짬뽕집', '중화루', '홍콩반점'],
+                '일식': ['스시', '돈카츠', '라멘', '우동'],
+                '양식': ['파스타', '스테이크', '빕스', '애슐리'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '국대떡볶이'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '롯데리아']
+            },
+            '수유': {
+                '한식': ['수유국밥', '삼겹살', '김치찌개', '쭈꾸미'],
+                '중식': ['차이나팩토리', '짬뽕집', '중화루', '홍콩반점'],
+                '일식': ['스시', '돈카츠', '라멘', '우동'],
+                '양식': ['파스타', '스테이크', '피자', '빕스'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '김밥천국'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '수제버거']
+            },
+            '연신내': {
+                '한식': ['연신내국밥', '삼겹살', '김치찌개', '쭈꾸미'],
+                '중식': ['차이나팩토리', '짬뽕집', '중화루', '홍콩반점'],
+                '일식': ['스시', '돈카츠', '라멘', '우동'],
+                '양식': ['파스타', '스테이크', '피자', '빕스'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '김밥천국'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '롯데리아']
+            },
+            '상수': {
+                '한식': ['상수쭈꾸미', '국밥', '삼겹살', '김치찌개'],
+                '중식': ['차이나팩토리', '짬뽕집', '중화루', '홍콩반점'],
+                '일식': ['스시', '돈카츠', '라멘', '우동'],
+                '양식': ['파스타', '스테이크', '피자', '리조또'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '국대떡볶이'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '수제버거']
+            },
+            '망원': {
+                '한식': ['망원동고기', '국밥', '삼겹살', '김치찌개'],
+                '중식': ['차이나팩토리', '짬뽕집', '중화루', '홍콩반점'],
+                '일식': ['스시', '돈카츠', '라멘', '우동'],
+                '양식': ['파스타', '스테이크', '피자', '리조또'],
+                '분식': ['신전떡볶이', '엽기떡볶이', '죠스떡볶이', '국대떡볶이'],
+                '치킨': ['교촌치킨', 'BBQ', 'BHC', '네네치킨'],
+                '피자': ['피자스쿨', '피자헛', '도미노피자', '미스터피자'],
+                '버거': ['버거킹', '맘스터치', '크라제버거', '수제버거']
+            }
+        };
+
+        const cafes = {
+            '홍대': ['스타벅스홍대점', '투썸플레이스', '할리스', '커피빈', '폴바셋', '탐앤탐스'],
+            '신촌': ['스타벅스신촌점', '투썸플레이스', '할리스', '커피빈', '이디야'],
+            '건대': ['스타벅스건대점', '투썸플레이스', '할리스', '커피빈', '메가커피'],
+            '혜화/대학로': ['스타벅스혜화점', '투썸플레이스', '할리스', '커피빈', '폴바셋'],
+            '성신여대': ['스타벅스성신여대점', '투썸플레이스', '할리스', '이디야', '메가커피'],
+            '왕십리': ['스타벅스왕십리점', '투썸플레이스', '할리스', '커피빈', '이디야'],
+            '노원': ['스타벅스노원점', '투썸플레이스', '할리스', '커피빈', '메가커피'],
+            '수유': ['스타벅스수유점', '투썸플레이스', '할리스', '이디야', '메가커피'],
+            '연신내': ['스타벅스연신내점', '투썸플레이스', '할리스', '커피빈', '이디야'],
+            '상수': ['스타벅스상수점', '투썸플레이스', '할리스', '커피빈', '폴바셋'],
+            '망원': ['스타벅스망원점', '투썸플레이스', '할리스', '커피빈', '메가커피']
+        };
+
+        const activities = {
+            '홍대': {
+                '보드게임': ['보드게임카페홍대점', '보드라이프', '롤링다이스'],
+                '노래방': ['코인노래방홍대점', '쿠키노래방', '수노래방'],
+                '영화': ['CGV홍대', '메가박스홍대', '롯데시네마홍대'],
+                '볼링': ['홍대볼링장', '스트라이크볼링'],
+                '방탈출': ['비트포비아홍대점', '방탈출카페']
+            },
+            '신촌': {
+                '보드게임': ['보드게임카페신촌점', '보드라이프'],
+                '노래방': ['코인노래방신촌점', '수노래방'],
+                '영화': ['CGV신촌', '아트레온'],
+                '볼링': ['신촌볼링장'],
+                '방탈출': ['방탈출카페신촌점']
+            },
+            '건대': {
+                '보드게임': ['보드게임카페건대점', '롤링다이스'],
+                '노래방': ['코인노래방건대점', '수노래방'],
+                '영화': ['롯데시네마건대입구', 'CGV건대'],
+                '볼링': ['건대볼링장'],
+                '방탈출': ['방탈출카페건대점']
+            }
+        };
+        
+        const lunchMenus = ['한식', '중식', '일식', '양식', '분식', '치킨', '피자', '버거'];
+        const dinnerMenus = ['한식', '중식', '일식', '양식', '치킨', '피자', '삼겹살', '곱창', '회', '고기'];
+
+        let afternoonActivities = [];
+        let nightActivities = [];
+
+        function selectWeather(weather) {
+            selectedWeather = weather;
+            const buttons = document.querySelectorAll('.section')[0].querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            updateActivities();
         }
-      } catch (e) {
-        console.error("Firestore 기록 오류:", e);
-      }
-    }
 
-    games.forEach(function (g) {
-      var b = document.createElement('button');
-      b.className = 'game';
-      b.innerHTML = `<span class='icon'>${g.icon}</span>${g.title}`;
-      b.onclick = function () {
-        recordClick(g.title);
-        loadGame(g.file);
-      };
-      grid.appendChild(b);
-    });
+        function selectTemp(temp) {
+            selectedTemp = temp;
+            const buttons = document.querySelectorAll('.section')[1].querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            updateActivities();
+        }
 
-    function updateDateTime() {
-      var now = new Date();
-      var options = {
-        year: 'numeric', month: 'long', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        weekday: 'short', hour12: false, timeZone: 'Asia/Seoul'
-      };
-      document.getElementById('datetime').textContent = now.toLocaleString('ko-KR', options);
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+        function selectVibe(vibe) {
+            selectedVibe = vibe;
+            const buttons = document.querySelectorAll('.section')[2].querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
 
-    document.getElementById('copyright').textContent = '© 2025 WHILILI. All rights reserved.';
-    document.getElementById('backBtn').onclick = () => location.href = 'https://whilili.github.io/TEST/';
-  </script>
+        function updateActivities() {
+            if (!selectedWeather || !selectedTemp) return;
+
+            const indoorAfternoon = ['카페', '보드게임', '대실', 'PC방', '만화카페', '방탈출', '쇼핑', 'VR체험', '찜질방', '코인노래방'];
+            const outdoorAfternoon = ['공원산책', '한강', '놀이공원', '동물원', '수족관', '전시회', '벼룩시장', '사진찍기', '드라이브'];
+            
+            const indoorNight = ['노래방', '영화', '볼링', '당구', '술집', '보드게임', '클럽', 'PC방', '만화카페', '코인노래방'];
+            const outdoorNight = ['야경보기', '산책', '한강', '드라이브', '야시장', '루프탑'];
+
+            if (selectedWeather === '비' || selectedWeather === '눈') {
+                afternoonActivities = indoorAfternoon;
+                nightActivities = indoorNight;
+            } else if (selectedWeather === '맑음') {
+                afternoonActivities = [...indoorAfternoon, ...outdoorAfternoon];
+                nightActivities = [...indoorNight, ...outdoorNight];
+            } else {
+                afternoonActivities = [...indoorAfternoon, ...outdoorAfternoon.slice(0, 5)];
+                nightActivities = [...indoorNight, ...outdoorNight];
+            }
+
+            if (selectedTemp === '매우더움' || selectedTemp === '더움') {
+                afternoonActivities = afternoonActivities.filter(a => 
+                    !['놀이공원', '동물원', '벼룩시장', '공원산책'].includes(a)
+                );
+                nightActivities = nightActivities.filter(a => 
+                    !['야시장', '산책'].includes(a)
+                );
+            } else if (selectedTemp === '추움' || selectedTemp === '쌀쌀') {
+                afternoonActivities = afternoonActivities.filter(a => 
+                    !['한강', '수족관', '야시장', '드라이브'].includes(a)
+                );
+                nightActivities = nightActivities.filter(a => 
+                    !['한강', '야시장', '루프탑'].includes(a)
+                );
+            }
+        }
+
+        function getRestaurant(location, menuType) {
+            if (restaurants[location] && restaurants[location][menuType]) {
+                const list = restaurants[location][menuType];
+                return list[Math.floor(Math.random() * list.length)];
+            }
+            return menuType;
+        }
+
+        function getCafe(location) {
+            if (cafes[location]) {
+                const list = cafes[location];
+                return list[Math.floor(Math.random() * list.length)];
+            }
+            return '카페';
+        }
+
+        function getActivityPlace(location, activityType) {
+            if (activities[location] && activities[location][activityType]) {
+                const list = activities[location][activityType];
+                return list[Math.floor(Math.random() * list.length)];
+            }
+            return activityType;
+        }
+
+        function startRandom() {
+            if (!selectedWeather || !selectedTemp || !selectedVibe) {
+                alert('모든 항목을 선택해주세요! 💕');
+                return;
+            }
+
+            document.getElementById('settingsScreen').classList.add('hidden');
+            document.getElementById('randomScreen').classList.remove('hidden');
+
+            document.getElementById('summaryWeather').textContent = selectedWeather;
+            document.getElementById('summaryTemp').textContent = selectedTemp;
+            document.getElementById('summaryVibe').textContent = selectedVibe;
+        }
+
+        function animateValue(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.transform = 'scale(1.15)';
+            element.style.transition = 'transform 0.3s ease';
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+            }, 300);
+        }
+
+        function randomDay() {
+            const result = days[Math.floor(Math.random() * days.length)];
+            document.getElementById('summaryDay').textContent = result;
+            animateValue('summaryDay');
+            return result;
+        }
+
+        function randomLocation() {
+            const location = locations[Math.floor(Math.random() * locations.length)];
+            selectedLocation = location;
+            const station = stationInfo[location][Math.floor(Math.random() * stationInfo[location].length)];
+            selectedStation = station;
+            document.getElementById('summaryLocation').textContent = `${location} (${station})`;
+            animateValue('summaryLocation');
+            return location;
+        }
+
+        function randomLunch() {
+            const menuType = lunchMenus[Math.floor(Math.random() * lunchMenus.length)];
+            const restaurant = getRestaurant(selectedLocation, menuType);
+            document.getElementById('summaryLunch').textContent = `${menuType} - ${restaurant}`;
+            animateValue('summaryLunch');
+            return menuType;
+        }
+
+        function randomAfternoon() {
+            if (afternoonActivities.length === 0) {
+                alert('날씨와 온도를 먼저 선택해주세요!');
+                return;
+            }
+            const activity = afternoonActivities[Math.floor(Math.random() * afternoonActivities.length)];
+            let result = activity;
+            
+            if (activity === '카페') {
+                const cafe = getCafe(selectedLocation);
+                result = `${activity} - ${cafe}`;
+            } else if (['보드게임', '노래방', '영화', '볼링', '방탈출'].includes(activity)) {
+                const place = getActivityPlace(selectedLocation, activity);
+                result = `${activity} - ${place}`;
+            }
+            
+            document.getElementById('summaryAfternoon').textContent = result;
+            animateValue('summaryAfternoon');
+            return activity;
+        }
+
+        function randomDinner() {
+            const menuType = dinnerMenus[Math.floor(Math.random() * dinnerMenus.length)];
+            const restaurant = getRestaurant(selectedLocation, menuType);
+            document.getElementById('summaryDinner').textContent = `${menuType} - ${restaurant}`;
+            animateValue('summaryDinner');
+            return menuType;
+        }
+
+        function randomNight() {
+            if (nightActivities.length === 0) {
+                alert('날씨와 온도를 먼저 선택해주세요!');
+                return;
+            }
+            
+            let filteredNight = [...nightActivities];
+            
+            if (selectedVibe === '완전여유' || selectedVibe === '여유') {
+                filteredNight = filteredNight.filter(a => 
+                    !['클럽', '볼링', 'PC방'].includes(a)
+                );
+            } else if (selectedVibe === '활동적' || selectedVibe === '완전빡세') {
+                filteredNight = filteredNight.filter(a => 
+                    !['산책', '야경보기', '만화카페'].includes(a)
+                );
+            }
+            
+            const activity = filteredNight[Math.floor(Math.random() * filteredNight.length)];
+            let result = activity;
+            
+            if (['노래방', '영화', '볼링', '보드게임'].includes(activity)) {
+                const place = getActivityPlace(selectedLocation, activity);
+                result = `${activity} - ${place}`;
+            }
+            
+            document.getElementById('summaryNight').textContent = result;
+            animateValue('summaryNight');
+            return activity;
+        }
+
+        function randomAll() {
+            randomDay();
+            setTimeout(() => randomLocation(), 200);
+            setTimeout(() => randomLunch(), 400);
+            setTimeout(() => randomAfternoon(), 600);
+            setTimeout(() => randomDinner(), 800);
+            setTimeout(() => {
+                randomNight();
+                document.getElementById('resetBtn').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function resetAll() {
+            location.reload();
+        }
+    </script>
 </body>
 </html>
