@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💕 우리의 랜덤 데이트</title>
+    <title>💕 주현이와의 데이트 코스</title>
     <style>
         * {
             margin: 0;
@@ -30,6 +30,7 @@
             max-width: 450px;
             width: 100%;
             height: 95vh;
+            max-height: 95vh;
             animation: fadeIn 0.5s ease;
             overflow: hidden;
             display: flex;
@@ -47,6 +48,7 @@
             font-size: 24px;
             margin-bottom: 8px;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
         .subtitle {
@@ -54,10 +56,35 @@
             color: #999;
             font-size: 13px;
             margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        #settingsScreen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #randomScreen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .screen-header {
+            flex-shrink: 0;
+        }
+
+        .button-container {
+            flex-shrink: 0;
+            padding-top: 10px;
         }
 
         .section {
             margin-bottom: 18px;
+            flex-shrink: 0;
         }
 
         .section-title {
@@ -109,7 +136,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            margin-top: 10px;
+            margin-top: 8px;
+            flex-shrink: 0;
         }
 
         .start-btn:hover {
@@ -129,7 +157,9 @@
         .timeline-wrapper {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding-right: 5px;
+            min-height: 0;
         }
 
         .timeline-wrapper::-webkit-scrollbar {
@@ -266,6 +296,7 @@
             .container {
                 padding: 15px;
                 height: 98vh;
+                max-height: 98vh;
             }
 
             h1 {
@@ -320,7 +351,7 @@
 <body>
     <div class="container">
         <div id="settingsScreen">
-            <h1>💕 우리의 랜덤 데이트</h1>
+            <h1>💕 주현이와의 데이트 코스</h1>
             <p class="subtitle">오늘의 완벽한 데이트를 만들어보세요!</p>
 
             <div class="section">
@@ -359,8 +390,10 @@
         </div>
 
         <div id="randomScreen" class="hidden">
-            <h1>💕 데이트 코스</h1>
-            <p class="subtitle">버튼을 눌러 오늘의 데이트를 결정하세요!</p>
+            <div class="screen-header">
+                <h1>💕 주현이와의 데이트코스</h1>
+                <p class="subtitle">버튼을 눌러 오늘의 데이트를 결정하세요!</p>
+            </div>
 
             <div class="timeline-wrapper">
                 <div class="timeline-summary">
@@ -438,8 +471,11 @@
                 </div>
             </div>
 
-            <button class="start-btn pink" onclick="randomAll()">🎲 데이트 코스 한번에 뽑기!</button>
-            <button class="start-btn hidden" id="resetBtn" onclick="resetAll()">🔄 처음으로</button>
+            <div class="button-container">
+                <button class="start-btn pink" id="randomAllBtn" onclick="randomAll()">🎲 데이트 코스 한번에 뽑기!</button>
+                <button class="start-btn hidden" id="resetBtn" onclick="resetAll()">🔄 처음으로</button>
+                <button class="start-btn hidden pink" id="rerollBtn" onclick="rerollAll()">🎰 다시 뽑기</button>
+            </div>
         </div>
     </div>
 
@@ -449,6 +485,20 @@
         let selectedVibe = '';
         let selectedLocation = '';
         let selectedStation = '';
+
+        let pickedDay = false;
+        let pickedLocation = false;
+        let pickedLunch = false;
+        let pickedAfternoon = false;
+        let pickedDinner = false;
+        let pickedNight = false;
+
+        let usedDays = [];
+        let usedLocations = [];
+        let usedLunchMenus = [];
+        let usedAfternoonActivities = [];
+        let usedDinnerMenus = [];
+        let usedNightActivities = [];
 
         const days = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
         const locations = ['홍대', '신촌', '건대', '혜화/대학로', '성신여대', '왕십리', '노원', '수유', '연신내', '상수', '망원'];
@@ -712,6 +762,22 @@
             return activityType;
         }
 
+        function getRandomFromArray(arr, usedArr) {
+            const available = arr.filter(item => !usedArr.includes(item));
+            if (available.length === 0) return null;
+            const selected = available[Math.floor(Math.random() * available.length)];
+            usedArr.push(selected);
+            return selected;
+        }
+
+        function checkAllPicked() {
+            if (pickedDay && pickedLocation && pickedLunch && pickedAfternoon && pickedDinner && pickedNight) {
+                document.getElementById('randomAllBtn').style.display = 'none';
+                document.getElementById('resetBtn').classList.remove('hidden');
+                document.getElementById('rerollBtn').classList.remove('hidden');
+            }
+        }
+
         function startRandom() {
             if (!selectedWeather || !selectedTemp || !selectedVibe) {
                 alert('모든 항목을 선택해주세요! 💕');
@@ -736,60 +802,109 @@
         }
 
         function randomDay() {
-            const result = days[Math.floor(Math.random() * days.length)];
+            if (pickedDay) return;
+            const result = getRandomFromArray(days, usedDays);
+            if (!result) {
+                alert('더 이상 선택 가능한 요일이 없습니다!');
+                return;
+            }
             document.getElementById('summaryDay').textContent = result;
             animateValue('summaryDay');
+            pickedDay = true;
+            const btn = document.querySelector('[onclick="randomDay(); randomLocation();"]');
+            if (btn) btn.style.display = 'none';
             return result;
         }
 
         function randomLocation() {
-            const location = locations[Math.floor(Math.random() * locations.length)];
+            if (pickedLocation) return;
+            const location = getRandomFromArray(locations, usedLocations);
+            if (!location) {
+                alert('더 이상 선택 가능한 지역이 없습니다!');
+                return;
+            }
             selectedLocation = location;
             const station = stationInfo[location][Math.floor(Math.random() * stationInfo[location].length)];
             selectedStation = station;
             document.getElementById('summaryLocation').textContent = `${location} (${station})`;
             animateValue('summaryLocation');
+            pickedLocation = true;
+            const btn = document.querySelector('[onclick="randomDay(); randomLocation();"]');
+            if (btn) btn.style.display = 'none';
+            checkAllPicked();
             return location;
         }
 
         function randomLunch() {
-            const menuType = lunchMenus[Math.floor(Math.random() * lunchMenus.length)];
+            if (pickedLunch) return;
+            const menuType = getRandomFromArray(lunchMenus, usedLunchMenus);
+            if (!menuType) {
+                alert('더 이상 선택 가능한 점심 메뉴가 없습니다!');
+                return;
+            }
             const restaurant = getRestaurant(selectedLocation, menuType);
             document.getElementById('summaryLunch').textContent = `${menuType} - ${restaurant}`;
             animateValue('summaryLunch');
+            pickedLunch = true;
+            const btn = document.querySelector('[onclick="randomLunch()"]');
+            if (btn) btn.style.display = 'none';
+            checkAllPicked();
             return menuType;
         }
 
         function randomAfternoon() {
+            if (pickedAfternoon) return;
             if (afternoonActivities.length === 0) {
                 alert('날씨와 온도를 먼저 선택해주세요!');
                 return;
             }
-            const activity = afternoonActivities[Math.floor(Math.random() * afternoonActivities.length)];
+            const activity = getRandomFromArray(afternoonActivities, usedAfternoonActivities);
+            if (!activity) {
+                alert('더 이상 선택 가능한 오후 활동이 없습니다!');
+                return;
+            }
             let result = activity;
             
             if (activity === '카페') {
                 const cafe = getCafe(selectedLocation);
-                result = `${activity} - ${cafe}`;
+                if (cafe !== '카페') {
+                    result = `카페 - ${cafe}`;
+                }
             } else if (['보드게임', '노래방', '영화', '볼링', '방탈출'].includes(activity)) {
                 const place = getActivityPlace(selectedLocation, activity);
-                result = `${activity} - ${place}`;
+                if (place !== activity) {
+                    result = `${activity} - ${place}`;
+                }
             }
             
             document.getElementById('summaryAfternoon').textContent = result;
             animateValue('summaryAfternoon');
+            pickedAfternoon = true;
+            const btn = document.querySelector('[onclick="randomAfternoon()"]');
+            if (btn) btn.style.display = 'none';
+            checkAllPicked();
             return activity;
         }
 
         function randomDinner() {
-            const menuType = dinnerMenus[Math.floor(Math.random() * dinnerMenus.length)];
+            if (pickedDinner) return;
+            const menuType = getRandomFromArray(dinnerMenus, usedDinnerMenus);
+            if (!menuType) {
+                alert('더 이상 선택 가능한 저녁 메뉴가 없습니다!');
+                return;
+            }
             const restaurant = getRestaurant(selectedLocation, menuType);
             document.getElementById('summaryDinner').textContent = `${menuType} - ${restaurant}`;
             animateValue('summaryDinner');
+            pickedDinner = true;
+            const btn = document.querySelector('[onclick="randomDinner()"]');
+            if (btn) btn.style.display = 'none';
+            checkAllPicked();
             return menuType;
         }
 
         function randomNight() {
+            if (pickedNight) return;
             if (nightActivities.length === 0) {
                 alert('날씨와 온도를 먼저 선택해주세요!');
                 return;
@@ -807,29 +922,94 @@
                 );
             }
             
-            const activity = filteredNight[Math.floor(Math.random() * filteredNight.length)];
+            const activity = getRandomFromArray(filteredNight, usedNightActivities);
+            if (!activity) {
+                alert('더 이상 선택 가능한 밤 활동이 없습니다!');
+                return;
+            }
             let result = activity;
             
             if (['노래방', '영화', '볼링', '보드게임'].includes(activity)) {
                 const place = getActivityPlace(selectedLocation, activity);
-                result = `${activity} - ${place}`;
+                if (place !== activity) {
+                    result = `${activity} - ${place}`;
+                }
             }
             
             document.getElementById('summaryNight').textContent = result;
             animateValue('summaryNight');
+            pickedNight = true;
+            const btn = document.querySelector('[onclick="randomNight()"]');
+            if (btn) btn.style.display = 'none';
+            checkAllPicked();
             return activity;
         }
 
         function randomAll() {
-            randomDay();
-            setTimeout(() => randomLocation(), 200);
-            setTimeout(() => randomLunch(), 400);
-            setTimeout(() => randomAfternoon(), 600);
-            setTimeout(() => randomDinner(), 800);
+            let delay = 0;
+            
+            if (!pickedDay && !pickedLocation) {
+                setTimeout(() => {
+                    randomDay();
+                    randomLocation();
+                }, delay);
+                delay += 200;
+            }
+            
+            if (!pickedLunch) {
+                setTimeout(() => randomLunch(), delay);
+                delay += 200;
+            }
+            
+            if (!pickedAfternoon) {
+                setTimeout(() => randomAfternoon(), delay);
+                delay += 200;
+            }
+            
+            if (!pickedDinner) {
+                setTimeout(() => randomDinner(), delay);
+                delay += 200;
+            }
+            
+            if (!pickedNight) {
+                setTimeout(() => randomNight(), delay);
+            }
+            
             setTimeout(() => {
-                randomNight();
+                document.getElementById('randomAllBtn').style.display = 'none';
                 document.getElementById('resetBtn').classList.remove('hidden');
-            }, 1000);
+                document.getElementById('rerollBtn').classList.remove('hidden');
+            }, delay + 200);
+        }
+
+        function rerollAll() {
+            pickedDay = false;
+            pickedLocation = false;
+            pickedLunch = false;
+            pickedAfternoon = false;
+            pickedDinner = false;
+            pickedNight = false;
+
+            usedDays = [];
+            usedLocations = [];
+            usedLunchMenus = [];
+            usedAfternoonActivities = [];
+            usedDinnerMenus = [];
+            usedNightActivities = [];
+
+            document.getElementById('summaryDay').textContent = '?';
+            document.getElementById('summaryLocation').textContent = '?';
+            document.getElementById('summaryLunch').textContent = '?';
+            document.getElementById('summaryAfternoon').textContent = '?';
+            document.getElementById('summaryDinner').textContent = '?';
+            document.getElementById('summaryNight').textContent = '?';
+
+            document.getElementById('randomAllBtn').style.display = '';
+            document.getElementById('resetBtn').classList.add('hidden');
+            document.getElementById('rerollBtn').classList.add('hidden');
+
+            const buttons = document.querySelectorAll('.mini-btn');
+            buttons.forEach(btn => btn.style.display = '');
         }
 
         function resetAll() {
